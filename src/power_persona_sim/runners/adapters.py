@@ -83,9 +83,19 @@ class MockAdapter(LLMAdapter):
 class OllamaAdapter(LLMAdapter):
     """로컬 ollama 서버 어댑터 (무과금)."""
 
-    def __init__(self, base_url: str = "http://localhost:11434", model: str = "llama3"):
+    #: 응답 길이 상한. 설문 응답은 선택지 한 줄이거나 두어 문장이다. 상한이 없으면
+    #: 소형 모델이 문단을 쏟아내 배치 시간이 몇 배로 늘고 파싱도 어려워진다.
+    DEFAULT_NUM_PREDICT = 192
+
+    def __init__(
+        self,
+        base_url: str = "http://localhost:11434",
+        model: str = "llama3",
+        num_predict: int = DEFAULT_NUM_PREDICT,
+    ):
         self.base_url = base_url
         self.model = model
+        self.num_predict = num_predict
 
     def generate(
         self,
@@ -100,7 +110,11 @@ class OllamaAdapter(LLMAdapter):
                 "system": system_prompt,
                 "prompt": user_message,
                 "stream": False,
-                "options": {"temperature": temperature, "seed": seed},
+                "options": {
+                    "temperature": temperature,
+                    "seed": seed,
+                    "num_predict": self.num_predict,
+                },
             }
         ).encode()
         req = urllib.request.Request(
@@ -202,7 +216,7 @@ def estimate_cost(
     survey: Survey, personas: list[PersonaRecord], config: RunConfig
 ) -> CostEstimate:
     """배치 실행 전 예상 요청 수·토큰·비용. 실호출 없이 계산한다."""
-    from .survey_runner import assemble_system_prompt
+    from .survey_runner import assemble_system_prompt, render_question
 
     request_count = len(personas) * len(survey.questions) * config.repetitions
     prompt_tokens = 0
@@ -211,7 +225,9 @@ def estimate_cost(
             assemble_system_prompt(persona, config.awareness_condition)
         )
         for question in survey.questions:
-            prompt_tokens += (system_tokens + _rough_tokens(question.text)) * config.repetitions
+            # 실제로 보내는 것은 문항 본문이 아니라 선택지·형식 지시가 붙은 렌더링 결과다
+            question_tokens = _rough_tokens(render_question(question))
+            prompt_tokens += (system_tokens + question_tokens) * config.repetitions
     completion_tokens = request_count * 150  # 설문 응답은 짧다 — 문항당 ~150tok 가정
 
     if get_model_pricing(config.model):
