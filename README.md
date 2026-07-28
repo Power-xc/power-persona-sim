@@ -37,6 +37,7 @@ graph LR
     DS -.-> B
     B -.-> D
     
+    style 데이터 fill:transparent
     style A fill:#e7f3ff
     style B fill:#fff4e7
     style C fill:#f3e7ff
@@ -47,30 +48,30 @@ graph LR
 
 ### 설계 결정
 
-**① 프롬프트 생성 vs 통계 표본 추출**
-- **포기한 것**: 신속성. 프롬프트로 즉석 페르소나 생성이 가장 빠르다.
-- **선택한 것**: 통계 기반 표본 추출 (KOSIS·대법원·건보공단·KREI 데이터)
-- **근거**: 시장에 이미 있는 "LLM 페르소나 연기시키기"는 대표성 근거가 없다. 우리는 국가 통계 분포에 정합한 표본을 얻어 실제 조사 결과와 82% 이상 순위 일치를 달성한다 (PROJECT-BRIEF.md §5.1~§6.3).
+**① 프롬프트 생성 대신 통계 표본 추출**
+- **포기한 것**: 신속성. 프롬프트로 즉석 페르소나를 만드는 쪽이 훨씬 빠르다.
+- **선택한 것**: 국가 통계에 정합한 데이터셋(KOSIS·대법원·건보공단·KREI 시드)에서 3단계 필터로 표본 추출.
+- **근거**: 프롬프트로 만든 페르소나는 만든 사람의 편견을 그대로 반영하고 대표성 근거가 없다. 분포에서 뽑은 표본은 그렇지 않다 — 이 차이가 이 도구의 존재 이유다.
 
 **② 절대 수치 표시 금지, 상대 비교만**
-- **포기한 것**: "43%가 이 의견에 동의" 같은 결론의 명확성
-- **선택한 것**: "세그먼트 A가 세그먼트 B보다 2.1배 높음" 같은 상대 순위
-- **근거**: Hullman et al.(2025) 논문에서 LLM이 극단값을 실제의 7배로 과대 추정함을 실증했다. 절대값은 45% 오차가 발생하나, 순위는 82% 일치한다 (PROJECT-BRIEF.md §6.1).
+- **포기한 것**: "43%가 동의" 같은 결론의 명확성.
+- **선택한 것**: 세그먼트 간 상대 순위와 차이(delta)만 리포트에 표시. 리포트 템플릿이 평균·비율 표시를 구조적으로 막는다.
+- **근거**: LLM 실리콘 샘플이 극단값을 크게 과대 추정한다는 실증 연구(아래 문헌). 절대 수준은 버리고 방향과 순위만 취하는 것이 방법론적으로 정직하다.
 
-**③ 4단계 검증 (분포·known-truth·일관성·교차검증)**
-- **포기한 것**: 빠른 결과 도출. "검증 실패 시 전량 폐기" 규칙이 있어서 실제 비율은 낮을 수 있다.
-- **선택한 것**: 신뢰도 우선. 검증 통과 문항만 채택하고 실패분은 폐기 (PROJECT-BRIEF.md §6.2).
-- **근거**: 공개 포트폴리오 프로젝트이므로 "속도보다 신뢰"가 핵심. 실제 사용처도 인간 조사의 사전 최적화용이지 대체용이 아니므로, 신뢰도가 정합성보다 중요.
+**③ 4단계 검증, 실패 시 전량 폐기**
+- **포기한 것**: 빠른 결과 도출. known-truth 재현 실패 한 건이면 시뮬레이션 전체를 버린다.
+- **선택한 것**: 분포 χ²(KOSIS 실측 기준분포 대조) · known-truth 재현율 · 자기일관성(반복 간 Kendall τ) · 멀티모델 교차검증.
+- **근거**: 검증 없는 시뮬레이션 결과는 "그럴듯해 보이는데 사실은 틀린" 최악의 산출물이다. 걸러진 결과만이 인간 조사를 줄여줄 수 있다.
 
-**④ CLI 기반 배치 + 사전 등록(PREREG)**
-- **포기한 것**: 웹 앱의 인터활성(필터링, 드릴다운)
-- **선택한 것**: 정적 CLI + dry-run → 비용 추정 → 승인 → 실행 → 검증 → HTML 리포트
-- **근거**: 300~480명 배치는 실제 API 비용이 발생한다 (Claude의 경우 $9~15). 프롬프트·모델을 사후 변경하면 분석 자유도 문제가 발생하므로(arXiv 2509.13397), 사전에 모든 파라미터를 고정하고 기록하는 PREREG.md가 필수.
+**④ CLI 배치 + 사전 등록(PREREG)**
+- **포기한 것**: 웹 앱의 상호작용성(필터링·드릴다운).
+- **선택한 것**: dry-run 기본 → 비용 추정 게이트 → 승인 후 실행 → jsonl 로그(시드 포함)·resume.
+- **근거**: 수백 명 배치는 실제 API 비용이 발생하므로 우발 실행을 구조로 막는다. 프롬프트·모델·시드를 사후 변경하면 결론이 뒤집히는 분석 자유도 문제(arXiv 2509.13397)가 있어 PREREG.md에 사전 고정한다.
 
-**⑤ Lazy import로 모듈 간 의존성 끊기**
-- **포기한 것**: 제약 없는 import. 다른 모듈이 미구현이면 import 실패.
-- **선택한 것**: 각 서브커맨드가 실행 시점에만 import 시도, 실패하면 명확한 에러 메시지 제공.
-- **근거**: 병렬 개발 환경. sampling/design/runners/validation이 아직 미구현 상태이지만, CLI와 report은 contracts.py만 준수하면 독립적으로 동작 가능.
+**⑤ 케이스와 엔진의 분리**
+- **포기한 것**: 첫 케이스(갈비찜 브랜드)에 최적화된 지름길.
+- **선택한 것**: 카테고리 지식은 전부 설정 파일로(`configs/signals/*.yaml`), 케이스 산출물은 `cases/`로 격리. 본체는 도메인 중립.
+- **근거**: 신호 키워드 사전 하나만 갈아끼우면 다른 카테고리 조사가 되도록 — 도구이지 일회성 분석이 아니다.
 
 ## 포지셔닝
 
@@ -94,21 +95,34 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 ```
 
-### CLI
+### CLI — 파이프라인 5커맨드
 
 ```bash
-# 표본 추출
+# ① 표본 추출 (오프라인 fixture / DuckDB 원격 / 로컬 parquet)
 power-persona-sim sample --source fixture --seed 42
 
-# 설계 검증 (커버리지 규율)
-power-persona-sim design-check survey.yaml
+# ② 설계 검증 — 커버리지 규율(레버↔지식↔문항 매핑)과 문항 무결성
+power-persona-sim design-check cases/cheongwayeon/design/survey.yaml
 
-# 시뮬레이션 실행 (기본: dry-run)
-power-persona-sim run survey.yaml --adapter mock
+# ③ 실행 — 기본은 dry-run: 예상 요청 수·비용만 표시하고 멈춘다
+power-persona-sim run cases/cheongwayeon/design/survey.yaml --source fixture --adapter mock
+power-persona-sim run ... --no-dry-run --out-dir results   # 응답 jsonl + manifest 저장
 
-# HTML 리포트 생성
-power-persona-sim report responses.json --out ./report.html
+# ④ 검증 — KOSIS 실측 기준분포와 χ² 대조 + known-truth·일관성·교차검증
+power-persona-sim validate results/raw/RUN_ID.jsonl \
+  --survey cases/cheongwayeon/design/survey.yaml \
+  --manifest results/RUN_ID.manifest.json \
+  --benchmark configs/benchmarks/population-kr.yaml
+
+# ⑤ 리포트 — 검증 판정을 품은 self-contained HTML
+power-persona-sim report results/raw/RUN_ID.jsonl \
+  --survey cases/cheongwayeon/design/survey.yaml \
+  --manifest results/RUN_ID.manifest.json --out results/report
 ```
+
+## 첫 케이스 — 청와연 靑瓦宴
+
+가상의 갈비찜 RMR 브랜드로 도구 전체를 검증한다. 이름이 격식(명절·잔치) 쪽으로 기울어 있어, "일상 수요층이 브랜드를 고려군에서 배제하는 원인이 제품이 아니라 이름·톤에서 발생한다"는 가설(H1)을 시뮬레이션으로 검증하도록 설계했다. 설계 전문은 [`cases/cheongwayeon/`](cases/cheongwayeon/) — 목표·지식블록 K1~K10·설문 30문항·60분 IDI 가이드·제품 스펙.
 
 ## 한계 (설계 전제)
 
