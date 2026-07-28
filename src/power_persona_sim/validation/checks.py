@@ -75,9 +75,100 @@ def check_distribution(
     )
 
 
-def _known_truth_matches(question: Question, values: list) -> int:
+#: 셀 ID("35-44_수도권_전체")를 만든 축 순서. segment_gap의 segment_by가 이걸 가리킨다.
+_CELL_AXIS_INDEX = {"age_band": 0, "region": 1, "household": 2}
+
+
+def _segments_of(manifest: SampleManifest | None, axis: str) -> dict[str, str]:
+    """uuid → 세그먼트 라벨. 축을 모르면 빈 매핑(= 평가 불가)."""
+    if manifest is None or axis not in _CELL_AXIS_INDEX:
+        return {}
+    index = _CELL_AXIS_INDEX[axis]
+    segments = {}
+    for assignment in manifest.assignments:
+        parts = assignment.cell_id.split("_")
+        if index < len(parts):
+            segments[assignment.uuid] = parts[index]
+    return segments
+
+
+def _share(values: list, option: str) -> float | None:
+    """해당 선택지를 고른 비율. 다지선다는 리스트 포함 여부로 본다."""
+    counted = [v for v in values if v is not None]
+    if not counted:
+        return None
+    hits = sum(
+        1
+        for v in counted
+        if (option in v if isinstance(v, (list, tuple)) else v == option)
+    )
+    return hits / len(counted)
+
+
+def _expect_matches(
+    question: Question,
+    expect: dict,
+    values: list,
+    uuids: list[str],
+    segments: dict[str, str],
+) -> int | None:
+    """설계 YAML의 known_truth.expect 스키마를 채점한다.
+
+    반환은 '재현으로 인정한 응답 수'이며, 채점 자체가 불가능하면 None이다.
+    None을 0으로 뭉개면 "판정 불가"가 "재현 실패"로 둔갑해 결과를 폐기시킨다.
+    """
+    kind = expect.get("kind")
+
+    if kind == "top_option":
+        # 최빈 응답이 실제 1위와 일치하는가 — 전부 인정 아니면 전부 불인정
+        counter = Counter(v for v in values if isinstance(v, str))
+        if not counter:
+            return 0
+        return len(values) if counter.most_common(1)[0][0] == expect.get("value") else 0
+
+    if kind == "rank_order":
+        order = list(expect.get("order") or [])
+        if not order:
+            return None
+        return sum(
+            1
+            for v in values
+            if isinstance(v, (list, tuple)) and list(v[: len(order)]) == order
+        )
+
+    if kind == "segment_gap":
+        # 절대 수치가 아니라 두 세그먼트 간 '방향'만 본다 (§6.3).
+        if not segments:
+            return None
+        higher, lower = expect.get("higher"), expect.get("lower")
+        option = expect.get("option")
+        buckets: dict[str, list] = defaultdict(list)
+        for value, uuid in zip(values, uuids, strict=True):
+            label = segments.get(uuid)
+            if label in (higher, lower):
+                buckets[label].append(value)
+        share_high = _share(buckets.get(higher, []), option)
+        share_low = _share(buckets.get(lower, []), option)
+        if share_high is None or share_low is None:
+            return None
+        return len(values) if share_high > share_low else 0
+
+    return None
+
+
+def _known_truth_matches(
+    question: Question,
+    values: list,
+    uuids: list[str] | None = None,
+    segments: dict[str, str] | None = None,
+) -> int | None:
     expected = question.known_truth
     assert expected is not None
+    # 설계 YAML이 싣는 형식 — {source, claim, expect:{kind, ...}, note}
+    if isinstance(expected, dict) and isinstance(expected.get("expect"), dict):
+        return _expect_matches(
+            question, expected["expect"], values, uuids or [], segments or {}
+        )
     if isinstance(expected, dict) and "range" in expected:
         lo, hi = expected["range"]
         return sum(1 for v in values if isinstance(v, (int, float)) and lo <= v <= hi)
@@ -96,6 +187,7 @@ def check_known_truth(
     responses: list[ResponseRecord],
     survey: Survey,
     min_reproduction_rate: float = 0.5,
+    manifest: SampleManifest | None = None,
 ) -> ValidationCheck:
     """알려진 정답 대조 — 재현율이 임계치 미만인 문항이 하나라도 있으면 실패.
 
@@ -111,36 +203,68 @@ def check_known_truth(
             details="known-truth 문항 없음 — 대조 불가. 설계에 검증 문항을 심을 것.",
         )
 
-    by_question: dict[str, list] = defaultdict(list)
+    by_question: dict[str, list[ResponseRecord]] = defaultdict(list)
     for r in responses:
-        by_question[r.question_id].append(r.parsed)
+        by_question[r.question_id].append(r)
+
+    # segment_gap 문항이 요구하는 축만 골라 uuid → 세그먼트 매핑을 만든다.
+    segments: dict[str, dict[str, str]] = {}
+    for q in kt_questions:
+        expect = q.known_truth.get("expect") if isinstance(q.known_truth, dict) else None
+        if isinstance(expect, dict) and expect.get("kind") == "segment_gap":
+            axis = str(expect.get("segment_by", ""))
+            segments.setdefault(axis, _segments_of(manifest, axis))
 
     failures: list[str] = []
+    unscorable: list[str] = []
     rates: dict[str, float] = {}
     for q in kt_questions:
-        values = by_question.get(q.id, [])
-        if not values:
+        records = by_question.get(q.id, [])
+        if not records:
             failures.append(q.id)
             rates[q.id] = 0.0
             continue
-        rate = _known_truth_matches(q, values) / len(values)
+        expect = q.known_truth.get("expect") if isinstance(q.known_truth, dict) else None
+        axis = str(expect.get("segment_by", "")) if isinstance(expect, dict) else ""
+        matches = _known_truth_matches(
+            q,
+            [r.parsed for r in records],
+            [r.persona_uuid for r in records],
+            segments.get(axis, {}),
+        )
+        if matches is None:
+            # 채점 불가는 통과도 실패도 아니다 — 설계·입력을 고치라고 드러낸다.
+            unscorable.append(q.id)
+            rates[q.id] = 0.0
+            failures.append(q.id)
+            continue
+        rate = matches / len(records)
         rates[q.id] = rate
         if rate < min_reproduction_rate:
             failures.append(q.id)
 
     passed = not failures
-    detail_rates = ", ".join(f"{qid}={rate:.0%}" for qid, rate in rates.items())
+    detail_rates = ", ".join(
+        f"{qid}=" + ("채점불가" if qid in unscorable else f"{rate:.0%}")
+        for qid, rate in rates.items()
+    )
     return ValidationCheck(
         name="known_truth",
         passed=passed,
         metrics={
             "questions": float(len(kt_questions)),
             "failed": float(len(failures)),
+            "unscorable": float(len(unscorable)),
             "min_rate": min_reproduction_rate,
             **{f"rate_{qid}": rate for qid, rate in rates.items()},
         },
         details=f"재현율 [{detail_rates}], 임계치 {min_reproduction_rate:.0%}. "
-        + ("전 문항 재현." if passed else f"실패 문항 {failures} — 결과 전체 폐기 대상."),
+        + ("전 문항 재현." if passed else f"실패 문항 {failures} — 결과 전체 폐기 대상.")
+        + (
+            f" 채점 불가 {unscorable} — 기대값 형식 또는 세그먼트 정보가 없어 대조하지 못했다."
+            if unscorable
+            else ""
+        ),
     )
 
 
