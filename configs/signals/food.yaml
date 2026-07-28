@@ -1,12 +1,17 @@
 # 갈비찜(식품) 카테고리 신호 사전 — PROJECT-BRIEF.md §5.1 2단계
 # 카테고리를 바꾸면 이 파일만 교체한다 (beauty.yaml, …).
+#
+# 매칭은 부분문자열이다. 짧은 한 글자 키워드는 엉뚱한 단어를 삼키므로 쓰지 않는다.
+# 실측: 브리프의 `국` 한 글자는 fixture 200건에서 56회 걸렸는데 그중 국물요리는
+# 9회뿐이고 41회가 `청국장`, 나머지가 `중국`·`태국`·`영국`·`전국`처럼 무관한 단어였다.
+# → 국물요리는 명시적 어휘로 풀어 쓰고, 청국장은 한식 어휘로 따로 넣는다.
 category: food-galbijjim
 text_field: culinary_persona
 
 signals:
   hansik_homefood:
     label: 한식·집밥 지향
-    keywords: [한식, 집밥, 나물, 국, 찌개, 반찬]
+    keywords: [한식, 집밥, 나물, 반찬, 찌개, 국물, 국밥, 된장국, 미역국, 칼국수, 청국장, 백반]
     weight: 2
   meat_preference:
     label: 육류 선호
