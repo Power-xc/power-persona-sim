@@ -114,14 +114,12 @@ def _load_validation_inputs(args: argparse.Namespace):
 
 
 def _run_validation(args: argparse.Namespace):
-    import yaml
-
-    from power_persona_sim.validation import validate
+    from power_persona_sim.validation import load_benchmark, validate
 
     responses, manifest, survey = _load_validation_inputs(args)
     benchmark = None
     if getattr(args, "benchmark", None):
-        benchmark = yaml.safe_load(Path(args.benchmark).read_text(encoding="utf-8"))
+        benchmark = load_benchmark(Path(args.benchmark))
     return responses, manifest, survey, validate(responses, manifest, survey, benchmark=benchmark)
 
 

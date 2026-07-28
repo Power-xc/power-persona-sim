@@ -6,6 +6,7 @@ excluded_question_ids로 빼고, 멀티모델 불일치는 details에 기록해 
 """
 
 from ..contracts import ResponseRecord, SampleManifest, Survey, ValidationReport
+from .benchmark import load_benchmark
 from .checks import (
     check_cross_model,
     check_distribution,
@@ -18,6 +19,7 @@ __all__ = [
     "check_distribution",
     "check_known_truth",
     "check_self_consistency",
+    "load_benchmark",
     "validate",
 ]
 

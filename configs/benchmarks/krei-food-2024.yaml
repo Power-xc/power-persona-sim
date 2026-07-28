@@ -1,0 +1,220 @@
+# KREI Food Consumption Behavior Survey (2024) — Benchmark
+#
+# Schema:
+#   purchase_channels: food purchase channel distribution
+#   convenience_food: HMR/RMR (ready-meal replacement) purchasing behavior
+#   dining_frequency: out-of-home dining frequency
+#   all values include: proportion, source_url, year, confidence, note
+#
+# Confidence levels: official (정부/기관), industry (협회/기업 보도), press (언론)
+# Missing data marked as value: null with explanatory note.
+
+metadata:
+  title: "KREI Food Consumption Behavior Survey 2024 Benchmarks"
+  source_org: "Korea Rural Economic Institute (KREI, 한국농촌경제연구원)"
+  source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+  survey_year: 2024
+  data_release_date: "2025-05-22"
+  confidence: official
+  sample_size: "3,188 households, 5,851 adult household members, 588 youth household members"
+  survey_method: "Rotating panel (5-year replacement cycle since 2023)"
+  updated_date: "2026-07-28"
+
+# Food purchase channel distribution (주 구입처)
+# As of 2024 survey (n=3,188 households)
+# Q: 식료품을 주로 어디에서 구입하십니까?
+purchase_channels:
+  "동네 슈퍼마켓 및 식자재마트":
+    proportion: 0.335
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Rank 1; 2024 data shows reversal from 2023 when hypermarket was #1"
+
+  "대형마트 (오프라인)":
+    proportion: 0.315
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Rank 2; includes department store groceries"
+
+  "온라인 쇼핑":
+    proportion: 0.097
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Significant jump from 4.1% in 2023 — emerging channel; includes e-commerce, 쿠팡, 마켓컬리 등"
+
+  "전통시장 및 재래시장":
+    proportion: null
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Specific proportion not extracted; implied as residual (~25.3%) from top 3 channels. Full statistical report required for exact value."
+
+  "기타 (생협, 직거래)":
+    proportion: null
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Proportion unknown; included in KREI survey but not highlighted in press summaries"
+
+# Convenience food (HMR: Home Meal Replacement; RMR: Ready Meal Replacement) purchasing
+# Instant consumption (즉석섭취식품) vs. instant cooking (즉석조리식품)
+convenience_food:
+  instant_consumption_weekly_plus:
+    # 즉석섭취식품을 주 1회 이상 구입하는 가구 비율 (e.g., ready-to-eat kimbap, 고기반찬 등)
+    proportion: 0.221
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Household rate; trending up from 15.3% in 2021"
+
+  instant_cooking_weekly_plus:
+    # 즉석조리식품을 주 1회 이상 구입하는 가구 비율 (e.g., 밀키트, 반조리 등)
+    proportion: 0.257
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Household rate; trending up from 16.2% in 2021"
+
+  purchase_frequency_distribution:
+    "주 1회 (once per week)":
+      proportion: 0.278
+      source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+      year: 2024
+      confidence: official
+      note: "Most frequent buying interval"
+
+    "2-3주에 한번 (biweekly)":
+      proportion: 0.259
+      source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+      year: 2024
+      confidence: official
+
+    "월 1회 (monthly)":
+      proportion: 0.163
+      source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+      year: 2024
+      confidence: official
+
+    "4-6일에 한번 (frequent)":
+      proportion: 0.110
+      source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+      year: 2024
+      confidence: official
+
+    "연 수회 이하":
+      proportion: 0.190
+      source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+      year: 2024
+      confidence: official
+      note: "Residual; implies occasional or non-buyers"
+
+  motivation_cost_efficiency:
+    # 간편식을 먹는 주된 이유: 재료 사는 것보다 비용이 더 적게 든다
+    proportion: 0.363
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Major shift from 17.8% in 2018; reflects high inflation perception and value-seeking"
+
+  motivation_convenience:
+    # 간편식을 먹는 주된 이유: 조리하기 번거롭고 귀찮아서
+    proportion: 0.178
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Declined from 24.9% in 2018; convenience is secondary to cost"
+
+  non_purchase_reason_price:
+    # 간편식을 먹지 않는 이유: 가격이 비싸서
+    proportion: 0.351
+    source_url: "https://www.krei.re.kr/krei/page/53?cmd=view&biblioId=543024&pageIndex=1"
+    year: 2024
+    confidence: official
+    note: "Price sensitivity is dominant barrier among non-purchasers"
+
+# Market size projection
+hmr_market_size:
+  calendar_year_2022:
+    sales_trillion_won: 5.8532
+    source_url: "https://www.krei.re.kr/"
+    year: 2024
+    confidence: official
+    note: "Domestic HMR (가정간편식·즉석식품류) sales; 17.4% YoY growth from 2021"
+
+  calendar_year_2024:
+    sales_trillion_won: 8.39
+    sales_nominal_growth_pct: 19.0
+    source_url: "https://www.krei.re.kr/"
+    year: 2024
+    confidence: official
+    note: "Real sales (deflated); significant acceleration driven by inflation pass-through"
+
+  forecast_2026:
+    sales_trillion_won: 7.5
+    source_url: "https://www.krei.re.kr/"
+    year: 2024
+    confidence: industry
+    note: "Forward projection; assumes modest growth and potential price stabilization"
+
+# Dining out frequency (외식 빈도) — not fully captured in extracted data
+dining_frequency:
+  weekly_dining_out:
+    proportion: null
+    source_url: null
+    year: null
+    confidence: null
+    note: "KREI 2024 survey includes dining behavior but specific frequency rates not yet extracted from published summaries. Full statistical table required."
+
+  delivery_takeout_weekly:
+    proportion: null
+    source_url: null
+    year: null
+    confidence: null
+    note: "배달 및 테이크아웃 빈도 데이터 미확보"
+
+# Age cohort breakdown (성인 가구원 연령대 분포)
+adult_respondent_age_distribution:
+  "20대":
+    proportion: 0.158
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+    note: "Adult household members; 5,851 respondents"
+
+  "30대":
+    proportion: 0.159
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+
+  "40대":
+    proportion: 0.191
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+
+  "50대":
+    proportion: 0.209
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+
+  "60대":
+    proportion: 0.186
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+
+  "70대 이상":
+    proportion: 0.097
+    source_url: "https://www.krei.re.kr/foodSurvey/page/285?cmd=view&pst=503545"
+    year: 2024
+    confidence: official
+
+_data_quality:
+  note: "KREI food consumption survey is official government-funded research with rotating panel methodology since 2023. Channel proportions and HMR frequency data directly sourced. Dining frequency and age-stratified channel preference require additional table extraction from full statistical report."
+  validation_methods: "Cross-check channel data against retail POS aggregates from FIS (aT); validate convenience food frequency against industry scanner data"
+  next_steps: "Obtain full PDF statistical tables to extract age-cohort stratification by purchase channel"

@@ -284,3 +284,33 @@ class TestE2E:
         report = validate(responses, manifest, survey)
         assert report.verdict in ("adopt", "discard")
         assert len(report.checks) == 4
+
+
+class TestBenchmarkLoader:
+    def test_load_fixture_converts_cell_keys(self):
+        from power_persona_sim.validation import load_benchmark
+
+        bench = load_benchmark("tests/fixtures/benchmarks/population_small.yaml")
+        assert "30-44_수도권" in bench
+        assert abs(sum(bench.values()) - 0.6098) < 1e-6
+
+    def test_load_full_benchmark_matches_sampling_cell_ids(self):
+        from power_persona_sim.validation import load_benchmark
+
+        bench = load_benchmark("configs/benchmarks/population-kr.yaml")
+        assert "30-44_수도권_자녀동거" in bench
+        assert len(bench) == 12
+        assert abs(sum(bench.values()) - 1.0) < 0.02  # 반올림 오차 허용
+
+    def test_null_proportions_are_skipped_not_faked(self, tmp_path):
+        from power_persona_sim.validation import load_benchmark
+
+        p = tmp_path / "b.yaml"
+        p.write_text(
+            "cells:\n"
+            '  "age=30-44|region=수도권":\n    proportion: 0.5\n'
+            '  "age=60-69|region=수도권":\n    proportion: null\n',
+            encoding="utf-8",
+        )
+        bench = load_benchmark(p)
+        assert bench == {"30-44_수도권": 0.5}
