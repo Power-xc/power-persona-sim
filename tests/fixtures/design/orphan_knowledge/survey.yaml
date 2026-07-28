@@ -1,0 +1,23 @@
+# K3을 묻는 문항은 일부러 넣어 뒀다 — 위반 (b)만 단독으로 잡히는지 보기 위해서다.
+id: orphan-knowledge-survey
+goal: ../minimal/goal.yaml
+knowledge: knowledge.yaml
+questions:
+  - id: Q1
+    section: B
+    text: 이 브랜드를 들어본 적 있나요?
+    qtype: single
+    knowledge_ids: [K1]
+    options: [있다, 없다]
+  - id: Q2
+    section: D
+    text: 이 가격을 어떻게 느끼시나요?
+    qtype: scale
+    knowledge_ids: [K2]
+    scale_points: 5
+  - id: Q3
+    section: F
+    text: 좋아하는 색은 무엇인가요?
+    qtype: single
+    knowledge_ids: [K3]
+    options: [파랑, 초록]

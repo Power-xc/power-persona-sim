@@ -1,0 +1,12 @@
+# 고의 결함: L3 유통 채널을 어떤 K도 지지하지 않는다 → 커버리지 위반 (a)
+business_goal: 비구매자를 구매자로 전환한다
+decision: 예산을 인지·가격·유통 중 어디에 쓸 것인가
+success_criteria: 세 레버에 우선순위가 붙는다
+one_sentence: 사지 않는 이유는 [___]이며 [___]를 바꾸면 전환된다
+levers:
+  - id: L1
+    name: 인지·도달
+  - id: L2
+    name: 가격·프로모션
+  - id: L3
+    name: 유통 채널

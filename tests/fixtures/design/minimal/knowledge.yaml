@@ -1,0 +1,9 @@
+knowledge:
+  - id: K1
+    statement: 브랜드를 아는가
+    lever_ids: [L1]
+    judgement_rule: 미인지가 많으면 도달 문제다
+  - id: K2
+    statement: 가격을 어떻게 느끼는가
+    lever_ids: [L2]
+    judgement_rule: 상한이 판매가 아래면 구성을 바꾼다

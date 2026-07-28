@@ -1,0 +1,10 @@
+# 고의 결함: scale 문항에 scale_points가 없다 — 몇 점 척도인지 모른 채 실행된다.
+id: bad-scale-survey
+goal: ../minimal/goal.yaml
+knowledge: ../minimal/knowledge.yaml
+questions:
+  - id: Q1
+    section: B
+    text: 이 브랜드에 얼마나 호감이 있으신가요?
+    qtype: scale
+    knowledge_ids: [K1]

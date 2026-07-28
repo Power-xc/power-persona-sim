@@ -1,0 +1,11 @@
+# 고의 결함: K2를 알아야 한다고 해놓고 묻는 문항이 없다 → 커버리지 위반 (c)
+id: unasked-knowledge-survey
+goal: ../minimal/goal.yaml
+knowledge: ../minimal/knowledge.yaml
+questions:
+  - id: Q1
+    section: B
+    text: 이 브랜드를 들어본 적 있나요?
+    qtype: single
+    knowledge_ids: [K1]
+    options: [있다, 없다]
