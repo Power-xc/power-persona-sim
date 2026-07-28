@@ -33,7 +33,7 @@ def validate(
     """종합 검증. 시그니처는 contracts.ValidationFacade와 동일하며
     benchmark(셀별 기대 비율, configs/benchmarks/ 산출물)만 선택 인자로 받는다."""
     dist_check = check_distribution(manifest, benchmark)
-    truth_check = check_known_truth(responses, survey)
+    truth_check = check_known_truth(responses, survey, manifest=manifest)
     consistency_check, excluded = check_self_consistency(responses, survey)
     cross_check = check_cross_model(responses, survey)
 

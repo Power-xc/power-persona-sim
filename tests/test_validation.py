@@ -1,5 +1,7 @@
 """validation 모듈 테스트."""
 
+from typing import ClassVar
+
 import pytest
 
 from power_persona_sim.contracts import (
@@ -154,6 +156,98 @@ class TestKnownTruth:
             knowledge_ids=["K1"], scale_points=10, known_truth={"range": [1, 10]},
         )
         assert check_known_truth([], make_survey([q])).passed is False
+
+
+def _kt_question(expect: dict, options: list[str]) -> Question:
+    """설계 YAML이 싣는 known_truth 형식 그대로의 문항."""
+    return Question(
+        id="Q1", section="A", text="도구?", qtype=QuestionType.SINGLE,
+        knowledge_ids=["K1"], options=options,
+        known_truth={"source": "s", "claim": "c", "expect": expect},
+    )
+
+
+class TestKnownTruthExpectSchema:
+    """설계 YAML의 known_truth.expect 스키마 채점.
+
+    이 형식을 검증기가 몰라서 어떤 응답이든 재현율 0%로 떨어지던 결함의 회귀 방지.
+    """
+
+    OPTIONS: ClassVar[list[str]] = ["엑셀", "BI 도구", "SQL"]
+
+    def test_top_option_reproduced_passes(self):
+        q = _kt_question({"kind": "top_option", "value": "엑셀"}, self.OPTIONS)
+        responses = [make_response("Q1", "엑셀") for _ in range(6)]
+        responses += [make_response("Q1", "SQL") for _ in range(2)]
+        check = check_known_truth(responses, make_survey([q]))
+        assert check.passed is True
+        assert check.metrics["rate_Q1"] == 1.0
+
+    def test_top_option_not_reproduced_fails(self):
+        q = _kt_question({"kind": "top_option", "value": "엑셀"}, self.OPTIONS)
+        responses = [make_response("Q1", "SQL") for _ in range(5)]
+        check = check_known_truth(responses, make_survey([q]))
+        assert check.passed is False
+        assert check.metrics["rate_Q1"] == 0.0
+
+    def test_rank_order_prefix_match(self):
+        q = Question(
+            id="Q1", section="A", text="순위?", qtype=QuestionType.RANK,
+            knowledge_ids=["K1"], options=["a", "b", "c"],
+            known_truth={
+                "source": "s", "claim": "c",
+                "expect": {"kind": "rank_order", "order": ["a", "b"]},
+            },
+        )
+        responses = [make_response("Q1", ["a", "b", "c"]) for _ in range(3)]
+        responses.append(make_response("Q1", ["c", "b", "a"]))
+        check = check_known_truth(responses, make_survey([q]))
+        assert check.metrics["rate_Q1"] == pytest.approx(0.75)
+
+    def test_segment_gap_direction_holds(self):
+        q = _kt_question(
+            {
+                "kind": "segment_gap", "segment_by": "age_band",
+                "option": "SQL", "higher": "25-34", "lower": "45-59",
+            },
+            self.OPTIONS,
+        )
+        manifest = make_manifest({"25-34_수도권_전체": 2, "45-59_수도권_전체": 2})
+        young = [a.uuid for a in manifest.assignments if a.cell_id.startswith("25-34")]
+        old = [a.uuid for a in manifest.assignments if a.cell_id.startswith("45-59")]
+        responses = [make_response("Q1", "SQL", persona_uuid=u) for u in young]
+        responses += [make_response("Q1", "엑셀", persona_uuid=u) for u in old]
+        check = check_known_truth(responses, make_survey([q]), manifest=manifest)
+        assert check.passed is True
+
+    def test_segment_gap_direction_reversed_fails(self):
+        q = _kt_question(
+            {
+                "kind": "segment_gap", "segment_by": "age_band",
+                "option": "SQL", "higher": "25-34", "lower": "45-59",
+            },
+            self.OPTIONS,
+        )
+        manifest = make_manifest({"25-34_수도권_전체": 2, "45-59_수도권_전체": 2})
+        young = [a.uuid for a in manifest.assignments if a.cell_id.startswith("25-34")]
+        old = [a.uuid for a in manifest.assignments if a.cell_id.startswith("45-59")]
+        responses = [make_response("Q1", "엑셀", persona_uuid=u) for u in young]
+        responses += [make_response("Q1", "SQL", persona_uuid=u) for u in old]
+        check = check_known_truth(responses, make_survey([q]), manifest=manifest)
+        assert check.passed is False
+
+    def test_segment_gap_without_manifest_is_unscorable_not_silent_pass(self):
+        q = _kt_question(
+            {
+                "kind": "segment_gap", "segment_by": "age_band",
+                "option": "SQL", "higher": "25-34", "lower": "45-59",
+            },
+            self.OPTIONS,
+        )
+        check = check_known_truth([make_response("Q1", "SQL")], make_survey([q]))
+        assert check.passed is False
+        assert check.metrics["unscorable"] == 1.0
+        assert "채점 불가" in check.details
 
 
 class TestSelfConsistency:
