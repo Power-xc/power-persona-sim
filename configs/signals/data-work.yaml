@@ -1,0 +1,49 @@
+# 사내 데이터 업무(B2B 소프트웨어) 카테고리 신호 사전
+# food.yaml과 같은 자리에 놓이는 교체 지점이다 — 카테고리가 바뀌면 이 파일만 바꾼다.
+#
+# text_field가 culinary_persona가 아니다. 업무용 도구 조사에서 식생활 서사는
+# 신호가 아니라 잡음이다. 직무 서사(professional_persona)로 갈아끼운다.
+#
+# ⚠️ 부분문자열 매칭이다. food.yaml의 `국` 사고(청국장·중국·전국을 삼킴)와
+# 같은 함정을 피하려고 아래 어휘는 전부 2글자 이상이고, 오탐이 잦은 낱말은
+# 앞뒤를 붙여 길게 썼다. 예: `개발`은 상품개발·지역개발까지 삼키므로 쓰지 않고
+# `소프트웨어`·`프로그램`으로 풀었다. `함수`는 수학 교사를 삼키므로 `엑셀 함수`로 좁혔다.
+category: b2b-data-work
+text_field: professional_persona
+
+signals:
+  data_handling:
+    label: 데이터를 다루는 업무
+    keywords: [데이터, 통계, 집계, 지표, 실적, 매출 분석, 수치]
+    weight: 3
+  spreadsheet:
+    label: 스프레드시트 의존
+    keywords: [엑셀, 스프레드시트, 엑셀 함수, 피벗, 시트로]
+    weight: 3
+  query_capable:
+    label: 쿼리·코드 직접 작성
+    keywords: [SQL, 쿼리, 데이터베이스, 파이썬, 소프트웨어, 프로그래밍, 전산 시스템]
+    weight: 3
+  reporting:
+    label: 보고·의사결정 산출물
+    keywords: [보고서, 보고 자료, 대시보드, 기획안, 실적 보고, 정책, 예산]
+    weight: 2
+  ops_admin:
+    label: 사무·관리 직무 맥락
+    keywords: [사무, 관리 업무, 행정, 회계, 재무, 인사, 영업 관리, 생산 관리]
+    weight: 1
+
+# 가격 민감도 축은 이 카테고리에 해당 사항이 없다 — 도입 비용을 판단하는 주체가
+# 응답자 개인이 아니라 조직이기 때문이다. 축을 비워 두면 점수는 0으로 기록된다.
+
+# 프롬프트 서사 블록의 소유자는 카테고리 설정이다.
+# 이 블록이 없으면 러너 기본값(식생활 서사)이 실린다 — 업무 도구 조사에서는 오염이다.
+persona_narrative:
+  fields:
+    - { label: 인물, column: persona }
+    - { label: 직무, column: professional_persona }
+    - { label: 역량, column: skills_and_expertise }
+    - { label: 관심사, column: hobbies_and_interests }
+  consistency_rule: >-
+    위 직무 서사와 모순되는 답을 하지 마세요. 서사에 없는 기술 경험(SQL·프로그래밍 등)을
+    있는 것처럼 지어내지 마세요.
