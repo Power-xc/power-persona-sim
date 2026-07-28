@@ -1,0 +1,186 @@
+# Benchmark: Galbi-jjim (갈비찜) / Korean Cuisine RMR Category
+#
+# Schema:
+#   market_size: category-level sales and growth
+#   seasonality: holiday (Lunar New Year, Chuseok) concentration
+#   share_by_format: HMR vs RMR segment split
+#   share_by_channel: retail channel distribution
+#   all values include: value, source_url, year, confidence, note
+#
+# Confidence levels: official (aT/정부), industry (협회/보도자료), press (신문기사)
+# Missing data marked as value: null with explanatory note.
+
+metadata:
+  title: "Galbi-jjim (Braised Short Ribs) & Korean Cuisine RMR Market Benchmarks"
+  source_orgs:
+    - "aT (Korea Agro-Fisheries & Food Trade Corporation, 한국농수산식품유통공사)"
+    - "KREI (Korea Rural Economic Institute)"
+    - "Korean Food Association (한국식품협회)"
+  source_url: "https://www.atfis.or.kr/home/board/FB0028.do"
+  market_category: "가정간편식 (HMR) / 레스토랑간편식 (RMR)"
+  updated_date: "2026-07-28"
+  note: "Galbi-jjim is classified as Korean RMR (restaurant-prepared convenience meal) or semi-prepared HMR (밀키트 형태)"
+
+# Market size and growth (전체 간편식 대비)
+market_segment:
+  hmr_rmar_total_market:
+    calendar_year_2024:
+      sales_trillion_won: 8.39
+      source_url: "https://www.krei.re.kr/foodInfo/"
+      year: 2024
+      confidence: official
+      note: "Total domestic HMR/RMR market (즉석식품·가정간편식); includes all categories"
+
+  korean_cuisine_hmr_share:
+    proportion: 0.27
+    source_url: "https://www.sommeliertimes.com/news/articleView.html?idxno=19958"
+    year: 2024
+    confidence: industry
+    note: "Korean cuisine share of meal kit (밀키트) market; MarketCurly 2024 trend report. Western (양식) leads at 40%."
+
+  braised_meat_category_rmar:
+    # Galbi-jjim, Galbijjim, braised beef short ribs
+    market_size_billion_won: null
+    source_url: null
+    year: null
+    confidence: null
+    note: "Specific galbi-jjim segment market size (조사 식품 세분시장) not published in open sources; likely aggregated under broader '육류 간편식' or '한식 밀키트' categories"
+
+# Seasonality patterns — holiday concentration
+# Lunar New Year (설날) and Chuseok (추석) are major driving occasions
+seasonality:
+  chuseok_preseason_surge:
+    # 추석 명절 연휴 시작 전 1~2주간의 오프라인 식품 구매 증가
+    surge_multiplier: 1.60
+    affected_channel: "농축수산물 전문점 (specialty ag/seafood shops)"
+    source_url: "https://www.openads.co.kr/content/contentDetail?contsId=18638"
+    year: 2024
+    confidence: press
+    note: "60% sales uplift 1-2 weeks before Chuseok holiday; strongest effect on meat/specialty food retailers"
+
+  chuseok_online_preseason:
+    # 추석 온라인 구매 (2주 전)
+    surge_multiplier: 1.66
+    affected_channel: "온라인 식품 쇼핑몰"
+    source_url: "https://www.fnnews.com/news/202409031427571532"
+    year: 2024
+    confidence: press
+    note: "Online grocery acceleration starts 2 weeks before Chuseok; 66% traffic increase"
+
+  chuseok_meat_product_surge:
+    # 추석 명절 전 육류(소고기) 온라인 구매 증가
+    surge_multiplier: 1.91
+    product_category: "육류 (beef, pork, short ribs)"
+    affected_channel: "온라인 쇼핑몰"
+    source_url: "https://www.fnnews.com/news/202409031427571532"
+    year: 2024
+    confidence: press
+    note: "91% surge in online meat purchases during Chuseok season; highest among all food categories"
+
+  lunar_new_year_preseason:
+    # 설날 연휴 전 5-3일 (D-5 ~ D-3) 매출 피크
+    peak_period_days_before: "3-5"
+    sales_concentration: "highest order volume and transaction value of season"
+    source_url: "https://www.openads.co.kr/content/contentDetail?contsId=18638"
+    year: 2026
+    confidence: press
+    note: "Lunar New Year 2026 marketing data; applies seasonally 2022-2025 as well"
+
+  lunar_new_year_package_trends:
+    # 설날 시즌: 패키지·세트 상품 중심
+    product_format: "gift sets, curated packages, lifestyle-oriented assortments"
+    shift_from_formal_gifts: true
+    source_url: "https://www.openads.co.kr/content/contentDetail?contsId=18638"
+    year: 2024
+    confidence: press
+    note: "Move away from standardized 명절 선물 → personalized convenience meal packages"
+
+  annual_holiday_calendar:
+    "Lunar New Year (설날)":
+      gregorian_date_2026: "2026-01-29"
+      holiday_period_days: 5
+      lead_time_days_before: "3-5"
+      purchase_surge_pct: null
+      note: "Traditionally late Jan or early Feb; major family meal occasion"
+
+    "Chuseok (추석)":
+      gregorian_date_2026: "2026-10-05"
+      holiday_period_days: 5
+      lead_time_days_before: "7-14"
+      purchase_surge_pct: 60
+      note: "Typically Sept-Oct; harvest festival; strong seasonality for braised meat dishes"
+
+# Distribution channel (유통 채널별)
+distribution_channels:
+  online_ecommerce:
+    proportion: null
+    platforms: ["쿠팡", "마켓컬리", "이마트/SSG", "카카오톡 선물하기", "개별 브랜드 몰"]
+    growth_trend: "strong_acceleration"
+    source_url: "https://www.fnnews.com/news/202409031427571532"
+    year: 2024
+    confidence: press
+    note: "Online meal kits seeing highest growth rate; Chuseok online surge 66% above baseline"
+
+  hypermarket_offline:
+    proportion: null
+    channel_names: ["이마트", "롯데마트", "코스트코", "홈플러스"]
+    note: "Braised meat products increasingly available as RMR semi-prepared sections; market share data unavailable"
+
+  specialty_retailers:
+    proportion: null
+    channel_names: ["농축수산물 전문점", "정육점", "한우 전문점"]
+    seasonality: "highly seasonal; peak during holidays"
+    source_url: "https://www.fnnews.com/news/202409031427571532"
+    year: 2024
+    confidence: press
+    note: "Specialty meat shops show strongest holiday surge (60%); primary for premium galbi-jjim"
+
+  restaurant_delivery:
+    proportion: null
+    platforms: ["요기요", "쿠팡이츠", "배달의민족"]
+    note: "RMR context: prepared dishes; not directly 간편식 but relevant for category cannibalization"
+
+# Korean food manufacturing sector performance
+korean_food_industry_2024:
+  manufacturing_business_growth_pct: 3.5
+  manufacturing_sales_growth_pct: 17.1
+  source_url: "https://www.foodtoday.or.kr/news/article.html?no=196580"
+  year: 2024
+  confidence: official
+  note: "Korean food manufacturing businesses and product sales growth; suggests strong export demand + domestic convenience food adoption"
+
+  traditional_korean_menu_proportion: 0.807
+  source_url: "https://www.foodtoday.or.kr/news/article.html?no=196580"
+  year: 2024
+  confidence: official
+  note: "80.7% of Korean foodservice menu offerings remain traditional cuisine; slight 1.9pp decline from prior year (fusion experimentation)"
+
+# Product format trends
+product_formats:
+  galbi_jjim_as_rmr:
+    # 갈비찜을 밀키트 또는 반조리식으로
+    description: "Ready-meal or semi-prepared kit version of galbi-jjim"
+    market_presence: true
+    estimated_market_penetration: null
+    source_url: null
+    year: null
+    confidence: null
+    note: "Known to exist (MarketCurly, 쿠팡, 한우 전문점 온라인몰) but specific volume/share unknown; inferred from Korean cuisine 27% meal kit share"
+
+  seasonal_limited_editions:
+    # 명절 한정 갈비찜 상품
+    availability: "holiday-exclusive (설, 추석 기간)"
+    format: ["밀키트", "RMR (냉장/냉동 반조리)", "gift set"]
+    brand_examples: ["CJ 더 정찬", "풀무원 다담", "온그린", "프리미엄 한우 전문몰"]
+    note: "Typical market strategy; data unavailable for specific SKU performance"
+
+_data_quality:
+  completeness_score: 0.45
+  note: "Galbi-jjim market data is fragmented. High-level trends (Korean RMR growth, holiday seasonality, online acceleration) confirmed via aT/KREI sources. Category-specific metrics (market size, channel share, age-cohort preferences) unavailable in open-source publications; likely held by industry associations or proprietary retail syndicated data (FIS, retail POS)."
+  gaps:
+    - "Specific galbi-jjim market size (billion won)"
+    - "RMR vs. HMR format split for this category"
+    - "Brand market share leaders"
+    - "Age-cohort purchase propensity"
+    - "Price elasticity, margin data"
+  next_steps: "Contact aT Market Information Division for FIS segmented market reports; request CJ CheilJedang, Pulmuone, and niche premium brands for product-level data"

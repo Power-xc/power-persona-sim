@@ -1,0 +1,80 @@
+# Test Fixture: Minimal Population Benchmark (4 cells)
+#
+# A reduced version of population-kr.yaml for unit testing validation logic.
+# Covers two age groups (30-44, 60-69) × two regions (수도권, 비수도권)
+# without family_type stratification.
+#
+# Schema matches full benchmark but with fewer cells.
+
+metadata:
+  title: "Test fixture — minimal population distribution"
+  source_org: "KOSIS"
+  source_url: "https://kosis.kr/"
+  year: 2025
+  confidence: official
+  note: "Simplified fixture for validation unit tests; proportions derived from full benchmark"
+
+# Marginal distributions
+marginal_dist:
+  age_groups:
+    "30-44":
+      proportion: 0.332
+      source_url: "https://jumin.mois.go.kr/"
+      year: 2025
+      confidence: official
+    "60-69":
+      proportion: 0.277
+      source_url: "https://jumin.mois.go.kr/"
+      year: 2025
+      confidence: official
+
+  region:
+    수도권:
+      proportion: 0.495
+      source_url: "https://kosis.kr/"
+      year: 2025
+      confidence: official
+    비수도권:
+      proportion: 0.505
+      source_url: "https://kosis.kr/"
+      year: 2025
+      confidence: official
+
+# 4-cell joint distribution (no family_type split)
+cells:
+  "age=30-44|region=수도권":
+    proportion: 0.1645
+    source_url: null
+    year: 2025
+    confidence: null
+    note: "Calculated: 0.332 × 0.495"
+    approximation: "independence"
+
+  "age=30-44|region=비수도권":
+    proportion: 0.1675
+    source_url: null
+    year: 2025
+    confidence: null
+    note: "Calculated: 0.332 × 0.505"
+    approximation: "independence"
+
+  "age=60-69|region=수도권":
+    proportion: 0.1371
+    source_url: null
+    year: 2025
+    confidence: null
+    note: "Calculated: 0.277 × 0.495"
+    approximation: "independence"
+
+  "age=60-69|region=비수도권":
+    proportion: 0.1407
+    source_url: null
+    year: 2025
+    confidence: null
+    note: "Calculated: 0.277 × 0.505"
+    approximation: "independence"
+
+_test_assertions:
+  cell_sum: 0.6098
+  note: "Sum of cells; expected 1.0 for full benchmark, but this fixture covers only 2 of 3 age groups (30-44, 60-69)"
+  intended_use: "χ² goodness-of-fit test, cell proportion validation"
