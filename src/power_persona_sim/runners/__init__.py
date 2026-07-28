@@ -19,6 +19,7 @@ from .survey_runner import (
     build_run_id,
     calculate_prompt_hash,
     derive_seed,
+    load_responses,
     parse_response,
 )
 
@@ -36,6 +37,7 @@ __all__ = [
     "create_adapter",
     "derive_seed",
     "estimate_cost",
+    "load_responses",
     "parse_response",
     "run_survey",
 ]

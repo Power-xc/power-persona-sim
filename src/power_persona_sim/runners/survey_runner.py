@@ -115,6 +115,19 @@ def parse_response(
     return raw_text  # OPEN
 
 
+def load_responses(path: Path) -> list[ResponseRecord]:
+    """results/raw jsonl 로그 → ResponseRecord 목록. validate·report 커맨드의 입력."""
+    records: list[ResponseRecord] = []
+    if not path.exists():
+        return records
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                records.append(ResponseRecord(**json.loads(line)))
+    return records
+
+
 class SurveyRunner:
     """배치 설문 실행기.
 
@@ -134,19 +147,8 @@ class SurveyRunner:
 
     @staticmethod
     def _load_completed(log_path: Path) -> tuple[set[tuple[str, str, int]], list[ResponseRecord]]:
-        completed: set[tuple[str, str, int]] = set()
-        records: list[ResponseRecord] = []
-        if not log_path.exists():
-            return completed, records
-        with log_path.open(encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                data = json.loads(line)
-                record = ResponseRecord(**data)
-                completed.add((record.persona_uuid, record.question_id, record.repetition))
-                records.append(record)
+        records = load_responses(log_path)
+        completed = {(r.persona_uuid, r.question_id, r.repetition) for r in records}
         return completed, records
 
     def run_survey(
