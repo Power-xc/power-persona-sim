@@ -1,5 +1,5 @@
 
-# Power-Ai-Builder: 개인 설정·시크릿 커밋 방지
+# 로컬 설정·시크릿 커밋 방지
 .claude/settings.local.json
 .mcp.local.json
 .env
@@ -17,7 +17,7 @@ dist/
 # 원응답 대용량 로그 (요약·분석 산출물만 커밋)
 results/raw/
 
-# 로컬 전용 — AI 킷 배선 (공개 repo에 미포함)
+# 에디터·도구 로컬 설정 (커밋 제외)
 .claude/
 .agents/
 .cursor/
