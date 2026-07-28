@@ -26,52 +26,41 @@
 %%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 8}}}}%%
 
 flowchart TD
-    CLI["CLI<br/>sample · design-check · run · validate · report"]
+    DS[("NVIDIA Nemotron Personas Korea<br/>100만 페르소나")]
 
-    subgraph IN["Inputs · 설정과 조사 설계"]
-        CFG["configs/signals · cells<br/>카테고리 신호 사전 · 12셀 설계"]
-        SVY["cases/*/design/<br/>Goal → Knowledge → Question"]
-        BENCH["configs/benchmarks/<br/>KOSIS·KREI 실측 기준값"]
+    subgraph IN["Inputs"]
+        CFG["configs/<br/>신호 사전 · 셀 설계"]
+        SVY["cases/*/design/<br/>설문 · IDI 설계"]
+        BENCH["configs/benchmarks/<br/>KOSIS·KREI 기준값"]
     end
 
-    subgraph ENGINE["Engine · src/power_persona_sim — contracts.py 계약으로 결합"]
-        SMP["Sampling<br/>하드 필터 → 신호 스코어링 → 셀 쿼터"]
-        DSG["Design Loader<br/>커버리지 규율 · 문항 무결성"]
-        RUN["Survey Runner<br/>프롬프트 조립 · sha256 시드 파생 · resume"]
-        GATE{"Cost Gate<br/>dry-run 기본 · 실호출 승인 필수"}
-        VAL["Validation<br/>분포 χ² · known-truth · 자기일관성 · 교차검증"]
-        RPT["Report<br/>절대수치 억제 · 상대 비교 전용"]
+    subgraph ENGINE["Engine · src/power_persona_sim"]
+        SMP["Sampling<br/>3단계 표본 추출"]
+        DSG["Design<br/>커버리지 규율"]
+        RUN["Runner<br/>프롬프트 · 시드 파생"]
+        GATE{"Cost Gate<br/>dry-run 기본"}
+        ADP["Adapters<br/>mock · ollama · claude · gemini"]
+        VAL["Validation<br/>χ² · known-truth · τ · 교차"]
+        RPT["Report<br/>상대 비교 전용"]
 
         SMP --> RUN
         DSG --> RUN
         RUN --> GATE
+        GATE -->|"승인 시에만"| ADP
+        ADP --> VAL
         VAL --> RPT
     end
 
-    subgraph OUT["Artifacts · 전부 재현 가능"]
-        MF["manifest.json<br/>표본 확정본 + seed"]
-        LOG["results/raw/*.jsonl<br/>응답 + 시드 + prompt_hash"]
-        HTML["report.html<br/>검증 판정 배지"]
-    end
+    OUT["Artifacts · manifest.json + 응답 jsonl(시드·prompt_hash) + report.html"]
 
-    DS[("NVIDIA Nemotron<br/>Personas Korea · 100만 건")]
-    LLM[("실행 백엔드<br/>mock · ollama · claude · gemini")]
-
-    CLI --> ENGINE
     DS --> SMP
     CFG --> SMP
     SVY --> DSG
-    SMP --> MF
-    GATE -->|"승인 시에만"| LLM
-    LLM --> LOG
-    MF --> VAL
-    LOG --> VAL
     BENCH --> VAL
-    RPT --> HTML
+    RPT --> OUT
 
     style IN fill:transparent,stroke:transparent
     style ENGINE fill:transparent,stroke:transparent
-    style OUT fill:transparent,stroke:transparent
 ```
 
 파이프라인을 관통하는 원칙이 둘 있다. **재현성** — run_id·파생 시드·prompt_hash가 전부 입력값의 해시라서, 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다. **관문** — 유료 호출 앞에는 비용 게이트가, 리포트 앞에는 검증 판정이 서 있고, 둘 다 우회할 수 없게 구조에 박혀 있다.
