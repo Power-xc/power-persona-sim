@@ -23,28 +23,62 @@
 ## 아키텍처 — 선별·설계·실행·검증·리포트 5단계
 
 ```mermaid
-graph LR
-    A["조사 목적<br/>(Goal)"] --> B["표본 설계<br/>(Sampling)"]
-    B --> C["조사 설계<br/>(Design)"]
-    C --> D["시뮬레이션<br/>(Runners)"]
-    D --> E["검증<br/>(Validation)"]
-    E --> F["HTML 리포트<br/>(Report)"]
-    
-    subgraph 데이터 ["🔗 데이터 (NVIDIA Nemotron)"]
-        DS["100만 페르소나<br/>26 컬럼<br/>CC BY 4.0"]
+graph TB
+    subgraph SG_IN["설정 · 설계 입력"]
+        CFG["configs/signals · cells<br/>카테고리 신호 사전 · 12셀 설계"]
+        SVY["cases/*/design/*.yaml<br/>Goal → Knowledge(K1~K10) → Question"]
+        BENCH["configs/benchmarks/<br/>KOSIS·KREI 실측 기준값 (출처 부착)"]
     end
-    
-    DS -.-> B
-    B -.-> D
-    
-    style 데이터 fill:transparent
-    style A fill:#e7f3ff
-    style B fill:#fff4e7
-    style C fill:#f3e7ff
-    style D fill:#ffe7f0
-    style E fill:#e7ffe7
-    style F fill:#ffe7e7
+
+    subgraph SG_DATA["데이터 — NVIDIA Nemotron Personas Korea (CC BY 4.0)"]
+        HF[("100만 페르소나<br/>26컬럼 · uuid 식별")]
+        SRC["dataset/ — 접근 4경로<br/>remote-duckdb · local-parquet · hf-datasets · fixture"]
+    end
+
+    subgraph SG_CORE["엔진 src/power_persona_sim — contracts.py 계약으로 결합"]
+        SMP["sampling/<br/>① 하드 필터 → ② 신호 스코어링 → ③ 셀 쿼터<br/>같은 seed → 같은 표본"]
+        DSG["design/<br/>백워드 디자인 로더 · 커버리지 규율<br/>MaxDiff·Van Westendorp 무결성 검증"]
+        RUN["runners/<br/>페르소나 프롬프트 조립(인지·미인지 분리)<br/>sha256 시드 파생 · jsonl 로깅 · resume"]
+        GATE{{"비용 게이트<br/>dry-run 기본 · estimate_cost<br/>실호출은 명시 승인 필수"}}
+        ADP["어댑터 4종<br/>mock · ollama · claude · gemini"]
+        VAL["validation/<br/>분포 χ² · known-truth 재현율<br/>자기일관성 τ · 멀티모델 교차"]
+        RPT["report/<br/>절대수치 억제 · 상대비교 전용<br/>self-contained HTML"]
+    end
+
+    subgraph SG_OUT["산출물 — 전부 재현 가능"]
+        MF["*.manifest.json<br/>표본 확정본 + seed + 설정"]
+        LOG["results/raw/*.jsonl<br/>응답 + 파생 시드 + prompt_hash(PREREG 대조)"]
+        HTML["report.html<br/>검증 판정 배지 · 제외 문항 표기"]
+    end
+
+    CLI["CLI — sample · design-check · run · validate · report"]
+
+    HF --> SRC
+    SRC --> SMP
+    CFG --> SMP
+    SVY --> DSG
+    SMP --> MF
+    SMP --> RUN
+    DSG --> RUN
+    RUN --> GATE
+    GATE -->|승인 시에만| ADP
+    ADP --> LOG
+    LOG --> VAL
+    MF --> VAL
+    BENCH --> VAL
+    VAL -->|"판정(adopt/discard) 동봉"| RPT
+    RPT --> HTML
+    CLI -.-> SMP & DSG & RUN & VAL & RPT
+
+    style SG_IN fill:transparent
+    style SG_DATA fill:transparent
+    style SG_CORE fill:transparent
+    style SG_OUT fill:transparent
+    style GATE fill:#fff4e7
+    style VAL fill:#e7ffe7
 ```
+
+파이프라인을 관통하는 원칙이 둘 있다. **재현성** — run_id·파생 시드·prompt_hash가 전부 입력값의 해시라서, 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다. **관문** — 유료 호출 앞에는 비용 게이트가, 리포트 앞에는 검증 판정이 서 있고, 둘 다 우회할 수 없게 구조에 박혀 있다.
 
 ### 설계 결정
 
