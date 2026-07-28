@@ -22,6 +22,10 @@ dependencies = [
 hf = ["datasets>=3.0", "huggingface_hub[hf_transfer]>=0.26"]
 dev = ["pytest>=8", "ruff>=0.6"]
 
+[project.urls]
+Repository = "https://github.com/Power-xc/power-persona-sim"
+Dataset = "https://huggingface.co/datasets/nvidia/Nemotron-Personas-Korea"
+
 [project.scripts]
 power-persona-sim = "power_persona_sim.cli:main"
 
