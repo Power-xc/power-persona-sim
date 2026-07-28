@@ -165,7 +165,6 @@ class TestMockAdapter:
         first = a.generate("sys", msg, seed=42)
         assert a.generate("sys", msg, seed=42) == first
         assert b.generate("sys", msg, seed=42) == first
-        assert a.generate("sys", msg, seed=43) != first or True  # 다른 시드는 달라질 수 있음
 
     def test_scale_detection(self):
         result = MockAdapter().generate("sys", "1~10점 척도에서 점수를 주세요", seed=42)
