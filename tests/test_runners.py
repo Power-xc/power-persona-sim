@@ -2,9 +2,12 @@
 
 import subprocess
 import sys
+from dataclasses import replace
+from typing import ClassVar
 
 import pytest
 
+import power_persona_sim.runners as pps_runners
 from power_persona_sim.contracts import (
     Goal,
     Knowledge,
@@ -15,10 +18,14 @@ from power_persona_sim.contracts import (
     RunConfig,
     Survey,
 )
+from power_persona_sim.design.schema import QuestionSpec
 from power_persona_sim.runners import (
+    DEFAULT_NARRATIVE,
     ClaudeAdapter,
     GeminiAdapter,
     MockAdapter,
+    OllamaAdapter,
+    PersonaNarrative,
     SurveyRunner,
     assemble_system_prompt,
     build_run_id,
@@ -27,6 +34,7 @@ from power_persona_sim.runners import (
     derive_seed,
     estimate_cost,
     parse_response,
+    render_question,
 )
 from tests.fixtures.runner.runner_persona_fixture import get_test_personas
 
@@ -99,6 +107,78 @@ class TestAssembleSystemPrompt:
         assert "들어본 적도 없습니다" in prompt
 
 
+class TestPersonaNarrative:
+    """서사 블록 교체 — 업무 도구 조사에 식생활 서사가 실리면 그 자체가 오염이다."""
+
+    NARRATIVE = PersonaNarrative(
+        fields=(("인물", "persona"), ("직무", "professional_persona")),
+        consistency_rule="위 직무 서사와 모순되는 답을 하지 마세요.",
+    )
+
+    def test_default_narrative_is_unchanged(self):
+        persona = get_test_personas()[0]
+        assert assemble_system_prompt(persona) == assemble_system_prompt(
+            persona, narrative=DEFAULT_NARRATIVE
+        )
+
+    def test_custom_narrative_reads_raw_columns(self):
+        """professional_persona는 PersonaRecord 필드가 아니라 raw에만 있다."""
+        base = get_test_personas()[0]
+        persona = replace(base, raw={**base.raw, "professional_persona": "데이터 집계 담당"})
+        prompt = assemble_system_prompt(persona, narrative=self.NARRATIVE)
+        assert "데이터 집계 담당" in prompt
+        assert "직무 서사와 모순" in prompt
+
+    def test_custom_narrative_drops_food_block(self):
+        persona = get_test_personas()[0]
+        prompt = assemble_system_prompt(persona, narrative=self.NARRATIVE)
+        assert persona.culinary_persona not in prompt
+        assert "식생활" not in prompt
+
+    def test_missing_column_is_skipped_not_rendered_empty(self):
+        persona = get_test_personas()[0]
+        narrative = PersonaNarrative(
+            fields=(("없는것", "no_such_column"), ("인물", "persona")), consistency_rule="규칙"
+        )
+        prompt = assemble_system_prompt(persona, narrative=narrative)
+        assert "없는것" not in prompt
+        assert persona.persona in prompt
+
+
+class TestOllamaModelWiring:
+    """--model이 ollama 어댑터까지 가지 않으면 기본값 llama3를 부른다 (무과금 경로 전체가 막힌다)."""
+
+    def test_factory_accepts_model(self):
+        assert create_adapter("ollama", model="gemma3:12b").model == "gemma3:12b"
+        assert isinstance(create_adapter("ollama"), OllamaAdapter)
+
+    def test_run_survey_forwards_model_to_ollama(self, monkeypatch, mini_survey):
+        captured: dict = {}
+
+        def spy(adapter_type, dry_run=True, **kwargs):
+            captured["type"] = adapter_type
+            captured.update(kwargs)
+            return MockAdapter()
+
+        monkeypatch.setattr(pps_runners, "create_adapter", spy)
+        config = make_config(adapter="ollama", model="gemma3:12b", dry_run=False)
+        pps_runners.run_survey(mini_survey, get_test_personas()[:1], config)
+        assert captured["model"] == "gemma3:12b"
+
+    def test_run_survey_sends_no_model_kwarg_to_paid_adapters(self, monkeypatch, mini_survey):
+        """유료 어댑터 생성자는 model을 받지 않는다 — 넘기면 TypeError로 죽는다."""
+        captured: dict = {}
+
+        def spy(adapter_type, dry_run=True, **kwargs):
+            captured.update(kwargs)
+            return MockAdapter()
+
+        monkeypatch.setattr(pps_runners, "create_adapter", spy)
+        config = make_config(adapter="claude", model="claude-opus-4-8", dry_run=False)
+        pps_runners.run_survey(mini_survey, get_test_personas()[:1], config)
+        assert "model" not in captured
+
+
 class TestDeterminism:
     def test_derive_seed_stable_in_process(self):
         assert derive_seed(42, "abc-123", "S1", 0) == derive_seed(42, "abc-123", "S1", 0)
@@ -155,6 +235,72 @@ class TestParseResponse:
             "expensive": 25000,
             "too_expensive": 40000,
         }
+
+
+class TestRenderQuestion:
+    """응답자가 실제로 보는 문항. 선택지를 안 보여주면 돌아오는 건 선택이 아니라 서술이다."""
+
+    def test_single_shows_options_and_format_rule(self):
+        q = Question(
+            id="Q1", section="A", text="주로 쓰는 도구는?", qtype=QuestionType.SINGLE,
+            knowledge_ids=["K1"], options=["엑셀", "SQL"],
+        )
+        rendered = render_question(q)
+        assert "엑셀" in rendered and "SQL" in rendered
+        assert "하나만" in rendered
+
+    def test_rank_states_top_n(self):
+        q = QuestionSpec(
+            id="Q2", section="A", text="순위는?", qtype=QuestionType.RANK,
+            knowledge_ids=["K1"], options=["a", "b", "c", "d"], config={"top_n": 3},
+        )
+        assert "3개" in render_question(q)
+
+    def test_scale_states_anchors(self):
+        q = QuestionSpec(
+            id="Q3", section="A", text="얼마나?", qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"], scale_points=7,
+            config={"anchor_low": "전혀", "anchor_high": "매우"},
+        )
+        rendered = render_question(q)
+        assert "1(전혀)" in rendered and "7(매우)" in rendered
+
+    def test_open_has_no_option_block(self):
+        q = Question(
+            id="Q4", section="B", text="무엇을 입력하시겠습니까?", qtype=QuestionType.OPEN,
+            knowledge_ids=["K1"],
+        )
+        assert "선택지" not in render_question(q)
+
+
+class TestParseRankWithOptions:
+    """여러 단어짜리 선택지를 공백으로 쪼개면 순위 데이터가 통째로 사라진다."""
+
+    OPTIONS: ClassVar[list[str]] = [
+        "숫자가 들어 있는 표",
+        "차트 그림",
+        "한두 문장으로 요약된 설명",
+    ]
+
+    def test_multiword_options_survive(self):
+        raw = "1. 숫자가 들어 있는 표, 차트 그림, 한두 문장으로 요약된 설명"
+        assert parse_response(raw, QuestionType.RANK, options=self.OPTIONS) == self.OPTIONS
+
+    def test_order_follows_response_not_option_order(self):
+        raw = "차트 그림, 숫자가 들어 있는 표"
+        assert parse_response(raw, QuestionType.RANK, options=self.OPTIONS) == [
+            "차트 그림", "숫자가 들어 있는 표",
+        ]
+
+    def test_unlisted_text_is_dropped(self):
+        raw = "차트 그림, 그리고 잘 모르겠어요"
+        assert parse_response(raw, QuestionType.RANK, options=self.OPTIONS) == ["차트 그림"]
+
+    def test_maxdiff_best_worst_labels(self):
+        raw = "가장중요: 차트 그림, 가장덜중요: 한두 문장으로 요약된 설명"
+        assert parse_response(raw, QuestionType.MAXDIFF, options=self.OPTIONS) == [
+            "차트 그림", "한두 문장으로 요약된 설명",
+        ]
 
 
 class TestMockAdapter:

@@ -5,6 +5,18 @@ import sys
 from pathlib import Path
 
 
+def _source_kwargs(args: argparse.Namespace) -> dict[str, Path]:
+    """--fixture-path를 소스 생성자 인자로 옮긴다.
+
+    케이스마다 페르소나 풀이 다르다 — 동봉 fixture만 쓸 수 있으면 케이스를
+    갈아끼울 수 없다. fixture 이외의 소스에는 해당 인자가 없으므로 무시한다.
+    """
+    path = getattr(args, "fixture_path", None)
+    if path and getattr(args, "source", None) == "fixture":
+        return {"path": Path(path)}
+    return {}
+
+
 def run_sample_cmd(args: argparse.Namespace) -> int:
     """표본 추출 서브커맨드."""
     try:
@@ -15,9 +27,12 @@ def run_sample_cmd(args: argparse.Namespace) -> int:
 
     signals_path = Path(args.signals) if args.signals else Path("configs/signals/food.yaml")
     cells_path = Path(args.cells) if args.cells else Path("configs/cells/default.yaml")
+    source_kwargs = _source_kwargs(args)
 
-    manifest = build_sample(signals_path, cells_path, seed=args.seed, source=args.source)
-    personas = load_personas(manifest)
+    manifest = build_sample(
+        signals_path, cells_path, seed=args.seed, source=args.source, source_kwargs=source_kwargs
+    )
+    personas = load_personas(manifest, source_kwargs=source_kwargs)
 
     print(f"표본 추출 완료: {len(personas)}명")
     print(f"  Seed: {args.seed}")
@@ -58,16 +73,27 @@ def run_run_cmd(args: argparse.Namespace) -> int:
     """
     from power_persona_sim.contracts import RunConfig
     from power_persona_sim.design import load_survey
-    from power_persona_sim.runners import build_run_id, estimate_cost, run_survey
-    from power_persona_sim.sampling import build_sample, load_personas
+    from power_persona_sim.runners import PersonaNarrative, build_run_id, estimate_cost, run_survey
+    from power_persona_sim.sampling import build_sample, load_personas, load_signals
     from power_persona_sim.sampling.manifest import save_manifest
 
     signals_path = Path(args.signals) if args.signals else Path("configs/signals/food.yaml")
     cells_path = Path(args.cells) if args.cells else Path("configs/cells/default.yaml")
+    source_kwargs = _source_kwargs(args)
 
-    manifest = build_sample(signals_path, cells_path, seed=args.seed, source=args.source)
-    personas = load_personas(manifest)
+    manifest = build_sample(
+        signals_path, cells_path, seed=args.seed, source=args.source, source_kwargs=source_kwargs
+    )
+    personas = load_personas(manifest, source_kwargs=source_kwargs)
     survey = load_survey(Path(args.survey))
+
+    # 서사 블록의 소유자는 카테고리 설정이다 — 없으면 러너 기본값(식생활).
+    signals = load_signals(signals_path)
+    narrative = (
+        PersonaNarrative(fields=signals.narrative_fields, consistency_rule=signals.narrative_rule)
+        if signals.narrative_fields
+        else None
+    )
 
     config = RunConfig(
         adapter=args.adapter,
@@ -91,7 +117,7 @@ def run_run_cmd(args: argparse.Namespace) -> int:
 
     print(estimate.summary())
     out_dir = Path(args.out_dir)
-    responses = run_survey(survey, personas, config, log_dir=out_dir / "raw")
+    responses = run_survey(survey, personas, config, log_dir=out_dir / "raw", narrative=narrative)
     run_id = build_run_id(survey, config)
     manifest_path = save_manifest(manifest, out_dir / f"{run_id}.manifest.json")
     print(f"실행 완료: 응답 {len(responses)}건")
@@ -165,6 +191,10 @@ def main() -> None:
         default="remote-duckdb",
         help="데이터 소스 (기본: remote-duckdb)",
     )
+    sample_parser.add_argument(
+        "--fixture-path",
+        help="--source fixture일 때 읽을 페르소나 jsonl 경로 (기본: 동봉 fixture)",
+    )
     sample_parser.set_defaults(func=run_sample_cmd)
 
     # design-check
@@ -183,6 +213,10 @@ def main() -> None:
         choices=["remote-duckdb", "local-parquet", "fixture"],
         default="fixture",
         help="데이터 소스 (기본: fixture)",
+    )
+    run_parser.add_argument(
+        "--fixture-path",
+        help="--source fixture일 때 읽을 페르소나 jsonl 경로 (기본: 동봉 fixture)",
     )
     run_parser.add_argument(
         "--adapter",

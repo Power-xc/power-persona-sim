@@ -30,6 +30,10 @@ class SignalConfig:
     signals: tuple[Signal, ...]
     price_axis: Signal | None
     raw: dict[str, Any]
+    #: 프롬프트에 실을 서사 블록 정의. 없으면 러너 기본값(식생활)을 쓴다.
+    #: (라벨, 컬럼명) 목록과 일관성 규칙 한 줄 — 카테고리가 서사를 소유한다.
+    narrative_fields: tuple[tuple[str, str], ...] = ()
+    narrative_rule: str = ""
 
     @property
     def max_score(self) -> float:
@@ -60,12 +64,21 @@ def load_signals(path: Path | str) -> SignalConfig:
     price_raw = raw.get("price_sensitivity_axis")
     price = _signal("price_sensitivity", price_raw) if price_raw else None
 
+    narrative = raw.get("persona_narrative") or {}
+    fields = tuple(
+        (str(f["label"]), str(f["column"])) for f in (narrative.get("fields") or [])
+    )
+    if narrative and not fields:
+        raise ValueError(f"persona_narrative에 fields가 없습니다: {path}")
+
     return SignalConfig(
         category=str(raw.get("category", "unknown")),
         text_field=str(raw.get("text_field", "culinary_persona")),
         signals=signals,
         price_axis=price,
         raw=raw,
+        narrative_fields=fields,
+        narrative_rule=str(narrative.get("consistency_rule", "")),
     )
 
 
