@@ -1,0 +1,29 @@
+# 고의 결함: VW가 4문항 한 벌이 아니라 3문항뿐 — 가격대 추정이 성립하지 않는다.
+id: bad-vw-survey
+goal: ../minimal/goal.yaml
+knowledge: ../minimal/knowledge.yaml
+questions:
+  - id: Q1
+    section: D
+    text: 얼마부터 너무 싸다고 느끼시나요?
+    qtype: van_westendorp
+    knowledge_ids: [K2]
+    config:
+      vw_set: base
+      vw_role: too_cheap
+  - id: Q2
+    section: D
+    text: 얼마부터 싸다고 느끼시나요?
+    qtype: van_westendorp
+    knowledge_ids: [K2]
+    config:
+      vw_set: base
+      vw_role: cheap
+  - id: Q3
+    section: D
+    text: 얼마부터 비싸다고 느끼시나요?
+    qtype: van_westendorp
+    knowledge_ids: [K2]
+    config:
+      vw_set: base
+      vw_role: expensive

@@ -1,0 +1,22 @@
+id: minimal-survey
+goal: goal.yaml
+knowledge: knowledge.yaml
+questions:
+  - id: S1
+    section: S
+    text: 최근 12개월 내 구매 경험이 있나요?
+    qtype: single
+    knowledge_ids: []
+    options: [있다, 없다]
+  - id: Q1
+    section: B
+    text: 이 브랜드를 들어본 적 있나요?
+    qtype: single
+    knowledge_ids: [K1]
+    options: [있다, 없다]
+  - id: Q2
+    section: D
+    text: 이 가격을 어떻게 느끼시나요?
+    qtype: scale
+    knowledge_ids: [K2]
+    scale_points: 5

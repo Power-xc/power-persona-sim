@@ -1,0 +1,77 @@
+# 청와연 靑瓦宴 — KNOWLEDGE (브리프 §4.2)
+# 전환 퍼널 순서로 K1~K10. 각 블록에 "왜 필요한가(decision_link)"와
+# "이 결과면 이렇게 한다(judgement_rule)"를 붙이는 것이 백워드 디자인의 핵심이다.
+# lever_ids가 비면 커버리지 규율 위반 — 삭제 대상이다.
+
+knowledge:
+  - id: K1
+    statement: 갈비찜 완제품을 언제·왜 사는가 — JTBD와 상황 트리거
+    decision_link: 커뮤니케이션 시점과 매대 전략을 정한다
+    lever_ids: [L1, L4, L5]
+    judgement_rule: >-
+      트리거가 명절 등 특정 시즌에 몰리면 시즌 집중 투자.
+      연중 분산이면 상시 수요 개발로 방향을 튼다.
+
+  - id: K2
+    statement: 지금 무엇을 사고 있는가 — 실제 경쟁자 집합
+    decision_link: 경쟁 프레임을 브랜드전으로 볼지 카테고리전으로 볼지 가른다
+    lever_ids: [L2, L5]
+    judgement_rule: >-
+      경쟁 대안이 타 브랜드면 브랜드전(차별점 소구).
+      직접 조리·외식이면 카테고리전(완제품의 존재 이유부터 설득).
+
+  - id: K3
+    statement: 청와연을 아는가, 안다면 어디서 알았는가
+    decision_link: 예산을 미디어에 쓸지 제품에 쓸지 가른다
+    lever_ids: [L1, L2]
+    judgement_rule: >-
+      미인지가 50% 이상이면 문제는 도달이다.
+      인지가 높은데 미구매가 많으면 문제는 제안이다.
+
+  - id: K4
+    statement: 인지자가 청와연을 고려군에 넣지 않는 이유
+    decision_link: 포지셔닝과 메시지를 정한다
+    lever_ids: [L3, L5]
+    judgement_rule: >-
+      가격 이미지가 지배하면 가치 근거를 강화한다.
+      아무것도 연상되지 않으면 차별점 자체가 없는 것이므로 제안을 다시 만든다.
+
+  - id: K5
+    statement: 고려했다가 탈락시킨 속성 — 무엇이 모자라 밀렸는가
+    decision_link: 제품 스펙 개선 우선순위를 정한다
+    lever_ids: [L2]
+    judgement_rule: 상위 두 속성에 R&D·SKU 자원을 집중한다.
+
+  - id: K6
+    statement: 가격 수용 범위와 준거가격
+    decision_link: 가격과 프로모션, 필요하면 용량 구성을 설계한다
+    lever_ids: [L2, L3]
+    judgement_rule: >-
+      수용 상한이 현 판매가보다 아래면 가격 인하가 아니라
+      용량·구성 재설계로 접근한다.
+
+  - id: K7
+    statement: 구매 채널 접점과 물리적 장벽 — 사려고 해도 못 사는가
+    decision_link: 유통 확장 순서를 정한다
+    lever_ids: [L4]
+    judgement_rule: 주 구매 채널에 미입점이면 유통이 1순위 레버다.
+
+  - id: K8
+    statement: 구매 시 불안과 리스크 — 실패 경험, 신뢰
+    decision_link: 보증·리뷰·샘플링 전략을 정한다
+    lever_ids: [L2, L5]
+    judgement_rule: 불안이 지배하면 소용량 트라이얼과 환불 보장을 먼저 붙인다.
+
+  - id: K9
+    statement: 전환 조건 — 무엇이 바뀌면 사겠는가 (반사실)
+    decision_link: 다섯 레버의 최종 우선순위를 확정한다
+    lever_ids: [L1, L2, L3, L4, L5]
+    judgement_rule: >-
+      K5·K6과 교차 검증한다. 반사실 응답과 속성·가격 응답이 어긋나면
+      진술 편향으로 보고 행동 근거(K1·K2) 쪽을 채택한다.
+
+  - id: K10
+    statement: 위 항목의 세그먼트별 차이
+    decision_link: 예산을 집중할 타겟 세그먼트를 고른다
+    lever_ids: [L1, L5]
+    judgement_rule: 전환 탄력성이 가장 큰 셀에 예산을 집중한다.

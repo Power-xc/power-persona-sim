@@ -1,0 +1,18 @@
+# 고의 결함 둘: Q1은 존재하지 않는 K9를 가리키고,
+# Q2는 스크리너가 아닌데 어떤 K도 가리키지 않는다.
+id: dangling-survey
+goal: ../minimal/goal.yaml
+knowledge: ../minimal/knowledge.yaml
+questions:
+  - id: Q1
+    section: B
+    text: 이 브랜드를 들어본 적 있나요?
+    qtype: single
+    knowledge_ids: [K9]
+    options: [있다, 없다]
+  - id: Q2
+    section: A
+    text: 평소 무엇을 즐겨 드시나요?
+    qtype: single
+    knowledge_ids: []
+    options: [한식, 양식]

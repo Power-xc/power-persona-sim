@@ -1,0 +1,14 @@
+# 고의 결함: 속성이 12개가 아니고, 세트 슬롯도 속성당 2회 노출에 못 미친다.
+id: bad-maxdiff-survey
+goal: ../minimal/goal.yaml
+knowledge: ../minimal/knowledge.yaml
+questions:
+  - id: Q1
+    section: C
+    text: 가장 중요한 것과 가장 덜 중요한 것을 골라주세요.
+    qtype: maxdiff
+    knowledge_ids: [K1]
+    options: [맛, 가격, 양, 간편함, 브랜드, 원산지, 포장, 보관, 건강, 후기]
+    config:
+      sets: 2
+      items_per_set: 4

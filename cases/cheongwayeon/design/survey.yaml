@@ -1,0 +1,410 @@
+# 청와연 靑瓦宴 — 정량 설문 (브리프 §4.3a)
+# 섹션 구조: [S] 스크리너 → [A] 카테고리 행태 → [B] 퍼널·브랜드
+#            → [C] 속성(MaxDiff) → [D] 가격(Van Westendorp) → [E] 전환 → [F] 프로파일
+#
+# 해석 규칙(§4.3a 경고, §6.3): 절대 수치는 읽지 않는다. MaxDiff·순위형이 주력이고
+# 척도·금액 문항은 세그먼트 간 차이로만 읽는다.
+
+id: cheongwayeon-survey-v1
+goal: goal.yaml
+knowledge: knowledge.yaml
+
+questions:
+  # ── [S] 스크리너 ────────────────────────────────────────────────
+  - id: S1
+    section: S
+    text: "최근 12개월 안에 갈비찜 완제품(밀키트·간편식·선물세트)을 직접 구매하신 적이 있나요?"
+    qtype: single
+    knowledge_ids: []
+    options:
+      - 있다
+      - 없다
+    config:
+      terminate_on: [없다]
+
+  - id: S2
+    section: S
+    text: "그때 구매하신 제품의 브랜드를 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: []
+    options:
+      - 청와연
+      - 대형 식품기업 브랜드
+      - 대형마트 자체브랜드(PB)
+      - 온라인 전문 밀키트 브랜드
+      - 백화점·정육점 자체 상품
+      - 브랜드를 기억하지 못함
+    config:
+      terminate_on: [청와연]
+
+  - id: S3
+    section: S
+    text: "가정에서 먹을 갈비찜을 고르고 사는 결정은 주로 누가 하시나요?"
+    qtype: single
+    knowledge_ids: []
+    options:
+      - 내가 주로 결정한다
+      - 다른 사람과 함께 결정한다
+      - 다른 사람이 결정한다
+    config:
+      terminate_on: [다른 사람이 결정한다]
+
+  # ── [A] 카테고리 행태 ───────────────────────────────────────────
+  - id: A1
+    section: A
+    text: "가장 최근에 갈비찜 완제품을 산 날, 그것을 사게 된 상황은 무엇이었나요?"
+    qtype: single
+    knowledge_ids: [K1]
+    options: &situations
+      - 명절 상차림 준비
+      - 가족 기념일·생일상
+      - 주말 가족 식사
+      - 손님 접대
+      - 평일 저녁 반찬
+      - 나를 위한 보상 한 끼
+
+  - id: A2
+    section: A
+    text: "아래 상황 중 본인이 갈비찜 완제품을 살 만한 상황을 많은 순서대로 세 개만 골라 순위를 매겨주세요."
+    qtype: rank
+    knowledge_ids: [K1]
+    options: *situations
+    config:
+      top_n: 3
+
+  - id: A3
+    section: A
+    text: "최근 12개월 동안 갈비찜 완제품을 몇 번이나 구매하셨나요?"
+    qtype: numeric
+    knowledge_ids: [K1]
+    config:
+      unit: 회
+      min: 0
+      max: 60
+
+  - id: A4
+    section: A
+    text: "지난 12개월 중 갈비찜 완제품을 구매한 시기를 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K1]
+    options:
+      - 명절 연휴 전후(설·추석)
+      - 봄(3~5월, 명절 제외)
+      - 여름(6~8월)
+      - 가을·초겨울(10~12월, 명절 제외)
+      - 특정 시기 없이 수시로
+    known_truth:
+      source: 농림축산식품부·aT 명절 성수품 수급 대책, KREI 식품소비행태조사 — 갈비·갈비찜은 설·추석 성수품
+      claim: 갈비찜 완제품 구매는 설·추석 명절 전후에 집중된다
+      expect:
+        kind: top_option
+        value: 명절 연휴 전후(설·추석)
+      note: >-
+        재현 실패 시(비명절 시기가 1위) 이 실행분의 K1 계열 결과를 폐기한다. 브리프 §6.2 ②
+
+  - id: A5
+    section: A
+    text: "그날 갈비찜 완제품 대신 고려했던 다른 방법이 있었다면 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K2]
+    options:
+      - 다른 브랜드의 갈비찜 완제품
+      - 정육을 사서 직접 조리
+      - 정육점·반찬가게의 즉석 조리 갈비찜
+      - 외식(식당에서 해결)
+      - 배달 주문
+      - 갈비찜이 아닌 다른 메뉴
+
+  - id: A6
+    section: A
+    text: "갈비찜 완제품을 주로 어디서 구매하시나요?"
+    qtype: single
+    knowledge_ids: [K7]
+    options:
+      - 대형마트
+      - 온라인 종합몰
+      - 새벽배송·프리미엄 식품몰
+      - 백화점·정육점
+      - 브랜드 자사몰
+      - 편의점·기타
+    known_truth:
+      source: 통계청 온라인쇼핑동향조사, KREI 식품소비행태조사 — 식품 온라인 구매 비중의 연령 역상관
+      claim: 온라인 채널을 주 채널로 고르는 비중은 젊은 연령대에서 높고 고연령대에서 낮다
+      expect:
+        kind: segment_gap
+        segment_by: age_band
+        option: 온라인 종합몰
+        higher: 20-39
+        lower: 60+
+      note: >-
+        절대 점유율이 아니라 세그먼트 간 방향만 본다. 방향이 뒤집히면 표본 또는
+        프롬프트를 의심하고 이 실행분을 폐기한다.
+
+  # ── [B] 퍼널·브랜드 ─────────────────────────────────────────────
+  - id: B1
+    section: B
+    text: "갈비찜 완제품 브랜드 중 떠오르는 이름을 아는 대로 적어주세요."
+    qtype: open
+    knowledge_ids: [K3]
+    config:
+      recall: unaided
+      note: 비보조 상기. 이 문항 전에는 청와연을 절대 노출하지 않는다.
+
+  - id: B2
+    section: B
+    text: "다음 브랜드 중 이름을 들어본 적이 있는 것을 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K3]
+    options:
+      - 청와연
+      - 반가담
+      - solar 한상
+      - 온기정
+      - 들어본 브랜드가 없다
+    config:
+      recall: aided
+      target_brand: 청와연
+      note: 청와연 외 항목은 상기 편향 통제를 위한 더미다.
+
+  - id: B3
+    section: B
+    text: "청와연을 어디서 처음 접하셨나요? 해당하는 것을 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K3]
+    options:
+      - 마트·매장 진열대
+      - 온라인 쇼핑몰 검색·추천
+      - SNS·유튜브 콘텐츠
+      - TV·옥외 광고
+      - 주변 사람의 추천
+      - 선물로 받아봄
+      - 기억나지 않음
+    config:
+      ask_if: B2에서 청와연 선택
+
+  - id: B4
+    section: B
+    text: "'청와연'이라는 이름을 들으면 어떤 것이 떠오르시나요? 떠오르는 대로 적어주세요."
+    qtype: open
+    knowledge_ids: [K4]
+    config:
+      ask_if: B2에서 청와연 선택
+
+  - id: B5
+    section: B
+    text: "가장 최근 갈비찜을 살 때 청와연을 후보에 넣지 않으셨다면, 그 이유를 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K4]
+    options:
+      - 비쌀 것 같아서
+      - 어떤 제품인지 잘 몰라서
+      - 내가 사는 곳에서 팔지 않아서
+      - 지금 사는 것에 충분히 만족해서
+      - 우리 집 식사에는 과한 느낌이라서
+      - 맛이 어떨지 확신이 없어서
+      - 특별히 이유는 없다
+    config:
+      ask_if: B2에서 청와연 선택
+
+  - id: B6
+    section: B
+    text: "청와연은 어떤 상황에 어울리는 제품이라고 느끼시나요?"
+    qtype: scale
+    knowledge_ids: [K4]
+    scale_points: 5
+    config:
+      anchor_low: 명절·손님상 같은 격식 있는 자리
+      anchor_high: 평일 저녁 같은 일상 식사
+      note: >-
+        H1(격식 프레임 가설)의 핵심 측정 문항. 절대 평균이 아니라
+        A1 트리거 세그먼트 간 차이로만 읽는다.
+
+  - id: B7
+    section: B
+    text: "평소 갈비찜을 사시는 그 매장이나 사이트에서 청와연 제품을 보신 적이 있나요?"
+    qtype: single
+    knowledge_ids: [K7]
+    options:
+      - 본 적 있다
+      - 본 적 없다
+      - 찾아본 적이 없어 모르겠다
+
+  # ── [C] 속성 평가 ───────────────────────────────────────────────
+  - id: C1
+    section: C
+    text: "갈비찜 완제품을 고를 때 아래 항목 중 가장 중요한 것과 가장 덜 중요한 것을 하나씩 골라주세요."
+    qtype: maxdiff
+    knowledge_ids: [K5]
+    options:
+      - 고기의 품질과 부위
+      - 고기의 양
+      - 양념 맛
+      - 국물·소스의 완성도
+      - 데우기만 하면 되는 간편함
+      - 가격
+      - 용량과 인분 구성
+      - 브랜드 신뢰도
+      - 원산지 표시
+      - 나트륨·첨가물 등 건강 요소
+      - 상차림·선물로서의 겉모습
+      - 보관 편의와 유통기한
+    config:
+      sets: 8
+      items_per_set: 4
+
+  - id: C2
+    section: C
+    text: "평소 사시는 갈비찜과 비교하면 청와연은 어느 쪽에 가깝다고 느끼시나요?"
+    qtype: scale
+    knowledge_ids: [K5]
+    scale_points: 5
+    config:
+      anchor_low: 평소 사는 제품이 더 낫다
+      anchor_high: 청와연이 더 나을 것 같다
+      attributes:
+        - 고기의 품질과 부위
+        - 양념 맛
+        - 가격 대비 가치
+        - 상차림·선물로서의 겉모습
+
+  # ── [D] 가격 (Van Westendorp) ───────────────────────────────────
+  - id: D1
+    section: D
+    text: "청와연 갈비찜 800g(2~3인분) 기준으로, 얼마부터 '너무 싸서 품질이 의심스럽다'고 느끼시나요?"
+    qtype: van_westendorp
+    knowledge_ids: [K6]
+    config:
+      vw_set: gv_800g
+      vw_role: too_cheap
+      unit: 원
+      stimulus: 청와연 갈비찜 800g(2~3인분) 상세 이미지와 원료 표시
+
+  - id: D2
+    section: D
+    text: "얼마부터 '싸다, 살 만하다'고 느끼시나요?"
+    qtype: van_westendorp
+    knowledge_ids: [K6]
+    config:
+      vw_set: gv_800g
+      vw_role: cheap
+      unit: 원
+
+  - id: D3
+    section: D
+    text: "얼마부터 '비싸다'고 느끼기 시작하시나요?"
+    qtype: van_westendorp
+    knowledge_ids: [K6]
+    config:
+      vw_set: gv_800g
+      vw_role: expensive
+      unit: 원
+
+  - id: D4
+    section: D
+    text: "얼마부터 '너무 비싸서 살 생각이 없어진다'고 느끼시나요?"
+    qtype: van_westendorp
+    knowledge_ids: [K6]
+    config:
+      vw_set: gv_800g
+      vw_role: too_expensive
+      unit: 원
+
+  # ── [E] 전환 가설 ───────────────────────────────────────────────
+  - id: E1
+    section: E
+    text: "갈비찜 완제품을 샀다가 실망한 적이 있다면, 그때 무슨 일이 있었는지 적어주세요."
+    qtype: open
+    knowledge_ids: [K8]
+
+  - id: E2
+    section: E
+    text: "처음 보는 갈비찜 완제품을 살 때 가장 걸리는 점을 모두 골라주세요."
+    qtype: multi
+    knowledge_ids: [K8]
+    options:
+      - 고기가 질기거나 양이 적을까 봐
+      - 양념이 입에 맞지 않을까 봐
+      - 가격만큼의 값을 못 할까 봐
+      - 원육의 원산지·등급을 믿기 어려워서
+      - 남으면 처치가 곤란해서
+      - 가족이 안 좋아할까 봐
+      - 특별히 걱정되는 점은 없다
+
+  - id: E3
+    section: E
+    text: "다음 중 무엇이 바뀌면 다음번에 청와연을 살 것 같은지, 영향이 큰 순서로 세 개만 골라 순위를 매겨주세요."
+    qtype: rank
+    knowledge_ids: [K9]
+    options:
+      - 가격이 지금보다 낮아진다
+      - 1~2인분 소용량 구성이 나온다
+      - 자주 가는 매장이나 앱에서 바로 살 수 있다
+      - 원육의 등급과 원산지가 분명히 표시된다
+      - 실제로 먹어본 사람의 후기가 충분히 쌓인다
+      - 명절이 아닌 평일 식사에도 어울리는 제안이 있다
+      - 맛보기·소용량 체험 기회가 있다
+      - 마음에 들지 않으면 환불해준다
+    config:
+      top_n: 3
+
+  - id: E4
+    section: E
+    text: "앞에서 1순위로 고른 조건이 실제로 충족된다면, 다음번에 청와연을 살 의향이 얼마나 있으신가요?"
+    qtype: scale
+    knowledge_ids: [K9]
+    scale_points: 11
+    config:
+      anchor_low: 전혀 살 생각이 없다
+      anchor_high: 반드시 사겠다
+      note: 절대 구매의향률로 읽지 않는다. E3 1순위 조건별 세그먼트 차이로만 읽는다.
+
+  # ── [F] 프로파일 ────────────────────────────────────────────────
+  # 페르소나가 이미 아는 값을 되묻는다. 응답이 원속성과 어긋나면 그 응답자는
+  # 역할을 유지하지 못한 것이므로 검증 단계에서 걸러낸다(persona_check).
+  - id: F1
+    section: F
+    text: "연령대를 골라주세요."
+    qtype: single
+    knowledge_ids: [K10]
+    options:
+      - 20-39
+      - 40-59
+      - 60+
+    config:
+      persona_check: age
+
+  - id: F2
+    section: F
+    text: "현재 함께 사는 가족 구성을 골라주세요."
+    qtype: single
+    knowledge_ids: [K10]
+    options:
+      - 1인 가구
+      - 부부 둘만
+      - 자녀와 함께
+      - 부모 세대와 함께
+      - 기타
+    config:
+      persona_check: family_type
+
+  - id: F3
+    section: F
+    text: "거주하시는 지역을 골라주세요."
+    qtype: single
+    knowledge_ids: [K10]
+    options:
+      - 수도권
+      - 광역시
+      - 그 외 지역
+    config:
+      persona_check: province
+
+  - id: F4
+    section: F
+    text: "집에서 갈비찜이나 찜 요리를 직접 조리하시는 빈도는 어느 정도인가요?"
+    qtype: single
+    knowledge_ids: [K10]
+    options:
+      - 월 1회 이상
+      - 명절이나 특별한 날에만
+      - 거의 하지 않는다

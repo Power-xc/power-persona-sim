@@ -1,0 +1,14 @@
+# 고의 결함: K3이 어떤 레버에도 매핑되지 않는다 → 커버리지 위반 (b), 삭제 대상
+knowledge:
+  - id: K1
+    statement: 브랜드를 아는가
+    lever_ids: [L1]
+    judgement_rule: 미인지가 많으면 도달 문제다
+  - id: K2
+    statement: 가격을 어떻게 느끼는가
+    lever_ids: [L2]
+    judgement_rule: 상한이 판매가 아래면 구성을 바꾼다
+  - id: K3
+    statement: 좋아하는 색이 무엇인가
+    lever_ids: []
+    judgement_rule: 알아도 쓸 데가 없다
