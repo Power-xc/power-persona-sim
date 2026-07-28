@@ -15,7 +15,7 @@ dist/
 .DS_Store
 
 # 원응답 대용량 로그 (요약·분석 산출물만 커밋)
-results/raw/
+results/
 
 # 에디터·도구 로컬 설정 (커밋 제외)
 .claude/
