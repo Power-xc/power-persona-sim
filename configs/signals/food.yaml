@@ -1,0 +1,32 @@
+# 갈비찜(식품) 카테고리 신호 사전 — PROJECT-BRIEF.md §5.1 2단계
+# 카테고리를 바꾸면 이 파일만 교체한다 (beauty.yaml, …).
+category: food-galbijjim
+text_field: culinary_persona
+
+signals:
+  hansik_homefood:
+    label: 한식·집밥 지향
+    keywords: [한식, 집밥, 나물, 국, 찌개, 반찬]
+    weight: 2
+  meat_preference:
+    label: 육류 선호
+    keywords: [고기, 삼겹살, 소고기, 갈비, 수육]
+    weight: 2
+  holiday_cooking:
+    label: 명절·행사 조리
+    keywords: [명절, 차례, 잔치, 손님, 생일]
+    weight: 3
+  convenience_open:
+    label: 간편식 수용
+    keywords: [간편식, 밀키트, 배달, 데워, 반조리]
+    weight: 2
+  premium:
+    label: 프리미엄 감수성
+    keywords: [한우, 백화점, 마켓컬리, 좋은 재료]
+    weight: 1
+
+# 총점에 합산하지 않는 별도 축 — 가격 민감도는 세그먼트 분석용 독립 점수
+price_sensitivity_axis:
+  label: 가격 민감
+  keywords: [저렴, 할인, 전통시장, 가성비]
+  weight: 1
