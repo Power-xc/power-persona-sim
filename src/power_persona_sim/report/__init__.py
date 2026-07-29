@@ -42,6 +42,11 @@ def render_report(
     # 응답을 세그먼트·문항별로 집계
     response_summary = _aggregate_responses(responses, survey)
 
+    # 실행에 쓰인 모델 목록. 둘 이상이면 집계가 모델을 합친 값이라는 사실을
+    # 리포트가 스스로 밝혀야 한다 — 교차검증 실행분을 단일 모델 결과로 읽으면
+    # 모델 간 불일치가 통계에 묻힌다.
+    models = sorted({r.model for r in responses})
+
     # 리포트 데이터 준비
     report_data = {
         "title": f"{survey.id} - 리포트",
@@ -50,6 +55,8 @@ def render_report(
         "validation": validation,
         "response_summary": response_summary,
         "total_responses": len(responses),
+        "models": models,
+        "persona_count": len({r.persona_uuid for r in responses}),
     }
 
     html_content = template.render(**report_data)
