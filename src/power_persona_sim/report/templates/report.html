@@ -6,6 +6,7 @@
     <title>{{ title }}</title>
     <style>
         :root[data-theme="dark"] {
+            color-scheme: dark;
             --bg: #1a1a1a;
             --text: #e0e0e0;
             --border: #333;
@@ -21,6 +22,7 @@
 
         :root[data-theme="light"],
         :root {
+            color-scheme: light;
             --bg: #ffffff;
             --text: #1a1a1a;
             --border: #e0e0e0;
@@ -174,8 +176,9 @@
 
         .question-type {
             display: inline-block;
-            background: var(--code-bg);
+            background: var(--card-bg);
             color: var(--accent);
+            border: 1px solid var(--accent);
             padding: 2px 8px;
             border-radius: 3px;
             font-size: 0.85em;
@@ -326,17 +329,6 @@
             }
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                color-scheme: dark;
-            }
-            body {
-                --bg: #1a1a1a;
-                --text: #e0e0e0;
-                --border: #333;
-                --code-bg: #2a2a2a;
-            }
-        }
     </style>
 </head>
 <body>
@@ -350,7 +342,7 @@
             <div class="meta-info">
                 <div class="meta-item">
                     <div class="meta-label">총 응답</div>
-                    <div>{{ total_responses }}명</div>
+                    <div>{{ total_responses }}건</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-label">데이터 소스</div>
@@ -497,7 +489,7 @@
                                     <span>{{ option }}:</span>
                                     <span style="margin-left: 10px; font-weight: bold;">
                                         {% if option in response_counts %}
-                                        {{ response_counts[option] }}명
+                                        {{ response_counts[option] }}건
                                         {% else %}
                                         0명
                                         {% endif %}
@@ -540,7 +532,7 @@
                             {{ option }}:
                             <span style="margin-left: 10px; font-weight: bold;">
                                 {% if option in option_counts %}
-                                {{ option_counts[option] }}명
+                                {{ option_counts[option] }}건
                                 {% else %}
                                 0명
                                 {% endif %}
@@ -560,7 +552,7 @@
                     {% else %}
                     <div>
                         <p style="font-size: 0.9em; opacity: 0.8;">
-                            ({{ q_data.total }}명의 정성 응답이 수집됨)
+                            ({{ q_data.total }}건의 정성 응답이 수집됨)
                         </p>
                     </div>
                     {% endif %}
