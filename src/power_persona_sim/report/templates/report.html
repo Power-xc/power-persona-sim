@@ -453,7 +453,12 @@
             <p style="margin-bottom: 20px; opacity: 0.8;">
                 ⚠️ 다음 결과는 절대 수치가 아니라 <strong>상대 순위와 세그먼트 간 차이(delta)</strong>만 의미합니다.
                 <br>
-                단일 LLM 모델의 출력이므로 인간 조사 대체가 아니라 가설 선별용으로만 사용하세요.
+                LLM 출력이므로 인간 조사 대체가 아니라 가설 선별용으로만 사용하세요.
+                {% if models | length > 1 %}
+                <br>
+                <strong>이 집계는 모델 {{ models | length }}종({{ models | join(', ') }})의 응답을 합친 값입니다.</strong>
+                모델 간 결론이 갈린 문항은 위 <em>cross_model</em> 검증 항목에 적혀 있습니다 — 그 문항은 여기 분포만 보고 판단하지 마세요.
+                {% endif %}
             </p>
 
             {% for q_id, q_data in response_summary.items() %}
@@ -461,12 +466,12 @@
                 <div class="question-text">
                     <span class="question-id">[{{ q_data.question.section }}]</span>
                     {{ q_data.question.text }}
-                    <span class="question-type">{{ q_data.question.qtype }}</span>
+                    <span class="question-type">{{ q_data.question.qtype.value }}</span>
                 </div>
 
                 <div class="response-summary">
                     <div style="font-size: 0.9em; margin-bottom: 10px; opacity: 0.8;">
-                        응답 수: {{ q_data.total }}명
+                        응답 {{ q_data.total }}건 (페르소나 {{ persona_count }}명 × 반복 × 모델)
                     </div>
 
                     {% if q_data.question.qtype == 'single' %}
