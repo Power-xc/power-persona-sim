@@ -10,8 +10,13 @@
             --text: #e0e0e0;
             --border: #333;
             --code-bg: #2a2a2a;
+            --card-bg: #232323;
+            --accent: #6aa9ff;
+            --muted: #a0a0a0;
             --badge-adopt: #2d5a2d;
             --badge-discard: #5a2d2d;
+            --on-adopt: #d4edda;
+            --on-discard: #f8d7da;
         }
 
         :root[data-theme="light"],
@@ -20,8 +25,13 @@
             --text: #1a1a1a;
             --border: #e0e0e0;
             --code-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --accent: #0066cc;
+            --muted: #666666;
             --badge-adopt: #d4edda;
             --badge-discard: #f8d7da;
+            --on-adopt: #155724;
+            --on-discard: #721c24;
         }
 
         * {
@@ -73,12 +83,12 @@
             background: var(--code-bg);
             padding: 12px;
             border-radius: 4px;
-            border-left: 3px solid #0066cc;
+            border-left: 3px solid var(--accent);
         }
 
         .meta-label {
             font-weight: bold;
-            color: #0066cc;
+            color: var(--accent);
             margin-bottom: 4px;
         }
 
@@ -133,13 +143,13 @@
         }
 
         .badge-adopt {
-            background: #d4edda;
-            color: #155724;
+            background: var(--badge-adopt);
+            color: var(--on-adopt);
         }
 
         .badge-discard {
-            background: #f8d7da;
-            color: #721c24;
+            background: var(--badge-discard);
+            color: var(--on-discard);
         }
 
         .question-block {
@@ -147,7 +157,7 @@
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 6px;
-            border-left: 4px solid #0066cc;
+            border-left: 4px solid var(--accent);
         }
 
         .question-text {
@@ -157,15 +167,15 @@
         }
 
         .question-id {
-            color: #0066cc;
+            color: var(--accent);
             font-weight: bold;
             margin-right: 8px;
         }
 
         .question-type {
             display: inline-block;
-            background: #e7f3ff;
-            color: #0066cc;
+            background: var(--code-bg);
+            color: var(--accent);
             padding: 2px 8px;
             border-radius: 3px;
             font-size: 0.85em;
@@ -173,8 +183,7 @@
         }
 
         .response-summary {
-            background: white;
-            dark-mode: var(--bg);
+            background: var(--card-bg);
             padding: 15px;
             border-radius: 4px;
             margin-top: 10px;
@@ -197,7 +206,7 @@
 
         .response-count {
             font-weight: bold;
-            color: #0066cc;
+            color: var(--accent);
         }
 
         .goal-section {
@@ -213,13 +222,13 @@
 
         .goal-label {
             font-weight: bold;
-            color: #0066cc;
+            color: var(--accent);
             margin-bottom: 5px;
         }
 
         .goal-content {
             padding-left: 15px;
-            border-left: 2px solid #0066cc;
+            border-left: 2px solid var(--accent);
         }
 
         .lever-list {
@@ -244,15 +253,14 @@
         .knowledge-item {
             padding: 12px;
             margin-bottom: 10px;
-            background: white;
-            dark-mode: var(--bg);
-            border-left: 3px solid #0066cc;
+            background: var(--card-bg);
+            border-left: 3px solid var(--accent);
             border-radius: 4px;
         }
 
         .knowledge-id {
             font-weight: bold;
-            color: #0066cc;
+            color: var(--accent);
         }
 
         .knowledge-statement {
@@ -261,7 +269,7 @@
 
         .knowledge-levers {
             font-size: 0.9em;
-            color: #666;
+            color: var(--muted);
             margin-top: 5px;
         }
 
@@ -275,12 +283,12 @@
 
         .verdict-adopt {
             background: var(--badge-adopt);
-            color: #155724;
+            color: var(--on-adopt);
         }
 
         .verdict-discard {
             background: var(--badge-discard);
-            color: #721c24;
+            color: var(--on-discard);
         }
 
         .theme-toggle {
