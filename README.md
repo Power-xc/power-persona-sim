@@ -23,44 +23,34 @@
 ## 시스템 아키텍처
 
 ```mermaid
-%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 8}}}}%%
-
+%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 8}, "rankSpacing": 34, "nodeSpacing": 24}, "themeVariables": {"fontSize": "13px"}}}%%
 flowchart TD
     DS[("NVIDIA Nemotron Personas Korea<br/>100만 페르소나")]
-
-    subgraph IN["Inputs"]
-        CFG["configs/<br/>신호 사전 · 셀 설계"]
-        SVY["cases/*/design/<br/>설문 · IDI 설계"]
-        BENCH["configs/benchmarks/<br/>KOSIS·KREI 기준값"]
-    end
-
+    CFG[("configs/<br/>신호 사전 · 셀 설계")]
+    SVY[("cases/*/design/<br/>설문 · IDI 설계")]
+    BENCH[("configs/benchmarks/<br/>KOSIS·KREI 기준값")]
     subgraph ENGINE["Engine · src/power_persona_sim"]
         SMP["Sampling<br/>3단계 표본 추출"]
         DSG["Design<br/>커버리지 규율"]
         RUN["Runner<br/>프롬프트 · 시드 파생"]
-        GATE{"Cost Gate<br/>dry-run 기본"}
-        ADP["Adapters<br/>mock · ollama · claude · gemini"]
-        VAL["Validation<br/>χ² · known-truth · τ · 교차"]
+        GATE{"Cost Gate"}
+        ADP["Adapters<br/>mock·ollama·claude·gemini"]
+        VAL["Validation<br/>χ²·known-truth·τ·교차"]
         RPT["Report<br/>상대 비교 전용"]
-
-        SMP --> RUN
-        DSG --> RUN
-        RUN --> GATE
-        GATE -->|"승인 시에만"| ADP
-        ADP --> VAL
-        VAL --> RPT
+        SMP & DSG --> RUN --> GATE
+        GATE -->|"dry-run 기본 · 승인 시에만"| ADP --> VAL --> RPT
     end
-
-    OUT["Artifacts · manifest.json + 응답 jsonl(시드·prompt_hash) + report.html"]
-
-    DS --> SMP
-    CFG --> SMP
+    OUT[("Artifacts<br/>manifest · jsonl · report.html")]
+    RPT --> OUT
+    DS & CFG --> SMP
     SVY --> DSG
     BENCH --> VAL
-    RPT --> OUT
 
-    style IN fill:transparent,stroke:transparent
-    style ENGINE fill:transparent,stroke:transparent
+    classDef ai fill:#8957e5,stroke:#6e40c9,color:#fff
+    classDef store fill:#2da44e,stroke:#1a7f37,color:#fff
+    class RUN,ADP ai
+    class DS,CFG,SVY,BENCH,OUT store
+    style ENGINE fill:transparent,stroke:#8c959f,stroke-dasharray:4 3
 ```
 
 파이프라인을 관통하는 원칙이 둘 있다. **재현성** — run_id·파생 시드·prompt_hash가 전부 입력값의 해시라서, 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다. **관문** — 유료 호출 앞에는 비용 게이트가, 리포트 앞에는 검증 판정이 서 있고, 둘 다 우회할 수 없게 구조에 박혀 있다.
