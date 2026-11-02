@@ -381,7 +381,7 @@ class TestSurveyRunner:
             assert resp.run_id == build_run_id(mini_survey, config)
             assert resp.prompt_hash
             assert resp.raw_text
-            assert resp.parsed is not None
+            assert resp.parsed not in (None, "")
 
     def test_run_survey_is_reproducible(self, mini_survey):
         personas = get_test_personas()
