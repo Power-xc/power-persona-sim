@@ -16,10 +16,13 @@ import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from ..contracts import PersonaRecord, RunConfig, Survey
 from .model_constants import calculate_cost, get_model_pricing
+
+if TYPE_CHECKING:
+    from .survey_runner import PersonaNarrative
 
 _APPROVAL_ENV = "PPS_ALLOW_API_CALLS"
 
@@ -222,14 +225,24 @@ def _rough_tokens(text: str) -> int:
     return max(1, len(text) // 2)
 
 
-def estimate_cost(survey: Survey, personas: list[PersonaRecord], config: RunConfig) -> CostEstimate:
-    """배치 실행 전 예상 요청 수·토큰·비용. 실호출 없이 계산한다."""
+def estimate_cost(
+    survey: Survey,
+    personas: list[PersonaRecord],
+    config: RunConfig,
+    narrative: PersonaNarrative | None = None,
+) -> CostEstimate:
+    """배치 실행 전 예상 요청 수·토큰·비용. 실호출 없이 계산한다.
+
+    narrative는 실행에 쓸 서사 블록과 같아야 한다 — 다르면 시스템 프롬프트 길이가 어긋난다.
+    """
     from .survey_runner import assemble_system_prompt, render_question
 
     request_count = len(personas) * len(survey.questions) * config.repetitions
     prompt_tokens = 0
     for persona in personas:
-        system_tokens = _rough_tokens(assemble_system_prompt(persona, config.awareness_condition))
+        system_tokens = _rough_tokens(
+            assemble_system_prompt(persona, config.awareness_condition, narrative)
+        )
         for question in survey.questions:
             # 실제로 보내는 것은 문항 본문이 아니라 선택지·형식 지시가 붙은 렌더링 결과다
             question_tokens = _rough_tokens(render_question(question))

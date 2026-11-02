@@ -105,7 +105,7 @@ def run_run_cmd(args: argparse.Namespace) -> int:
         awareness_condition=args.awareness_condition,
         dry_run=not args.no_dry_run,
     )
-    estimate = estimate_cost(survey, personas, config)
+    estimate = estimate_cost(survey, personas, config, narrative)
 
     if config.dry_run:
         print("[DRY RUN] 실행하지 않았습니다.")
