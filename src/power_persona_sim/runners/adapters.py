@@ -25,6 +25,8 @@ if TYPE_CHECKING:
     from .survey_runner import PersonaNarrative
 
 _APPROVAL_ENV = "PPS_ALLOW_API_CALLS"
+_OLLAMA_TIMEOUT_SEC = 120
+_COMPLETION_TOKENS_PER_REQUEST = 150  # 설문 응답은 짧다 — 요청당 ~150tok 가정
 
 
 class LLMAdapter(ABC):
@@ -137,7 +139,7 @@ class OllamaAdapter(LLMAdapter):
             headers={"Content-Type": "application/json"},
         )
         try:
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=_OLLAMA_TIMEOUT_SEC) as resp:
                 return json.loads(resp.read())["response"]
         except urllib.error.URLError as e:
             raise RuntimeError(
@@ -247,7 +249,7 @@ def estimate_cost(
             # 실제로 보내는 것은 문항 본문이 아니라 선택지·형식 지시가 붙은 렌더링 결과다
             question_tokens = _rough_tokens(render_question(question))
             prompt_tokens += (system_tokens + question_tokens) * config.repetitions
-    completion_tokens = request_count * 150  # 설문 응답은 짧다 — 문항당 ~150tok 가정
+    completion_tokens = request_count * _COMPLETION_TOKENS_PER_REQUEST
 
     if get_model_pricing(config.model):
         cost = calculate_cost(config.model, prompt_tokens, completion_tokens)
