@@ -19,7 +19,7 @@ TEST_PERSONAS = [
         culinary_persona="주말에 가족과 함께 외식을 즐기며, 명절에는 직접 갈비찜을 준비합니다.",
         family_persona="아내와 중학생 자녀 1명과 함께 삽니다.",
         hobbies_and_interests="주말 등산, 가족 여행, 요리",
-        raw={}
+        raw={},
     ),
     PersonaRecord(
         uuid="test-persona-002",
@@ -36,7 +36,7 @@ TEST_PERSONAS = [
         culinary_persona="매주 직접 반찬을 만들며, 갈비찜은 명절 잔치 음식으로 생각합니다.",
         family_persona="남편과 함께 거주하며 자녀는 이미 성인입니다.",
         hobbies_and_interests="시장 장보기, 전통 요리, 종교 활동",
-        raw={}
+        raw={},
     ),
 ]
 

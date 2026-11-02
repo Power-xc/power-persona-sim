@@ -71,7 +71,8 @@ def test_report_no_absolute_percentages():
 
         # 절대 수치 패턴 제거 (예: "45%", "32.5%")
         import re
-        percentage_pattern = r'\d+(\.\d+)?%'
+
+        percentage_pattern = r"\d+(\.\d+)?%"
         matches = re.findall(percentage_pattern, content)
 
         # 수치 표현만 있고 %는 없어야 함

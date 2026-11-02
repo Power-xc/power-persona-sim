@@ -64,7 +64,9 @@ def mini_survey() -> Survey:
         one_sentence="X를 사는 사람이 우리를 안 사는 이유는 [인지]이다",
     )
     knowledge = [
-        Knowledge(id="K1", statement="언제 구매하는가", lever_ids=["L1"], judgement_rule="명절 80% 이상")
+        Knowledge(
+            id="K1", statement="언제 구매하는가", lever_ids=["L1"], judgement_rule="명절 80% 이상"
+        )
     ]
     questions = [
         Question(
@@ -226,9 +228,7 @@ class TestParseResponse:
         assert parse_response("주말에 사요", QuestionType.SINGLE, options=options) == "주말"
 
     def test_parse_van_westendorp_numbers(self):
-        result = parse_response(
-            "10000, 15000, 25000, 40000", QuestionType.VAN_WESTENDORP
-        )
+        result = parse_response("10000, 15000, 25000, 40000", QuestionType.VAN_WESTENDORP)
         assert result == {
             "too_cheap": 10000,
             "cheap": 15000,
@@ -242,8 +242,12 @@ class TestRenderQuestion:
 
     def test_single_shows_options_and_format_rule(self):
         q = Question(
-            id="Q1", section="A", text="주로 쓰는 도구는?", qtype=QuestionType.SINGLE,
-            knowledge_ids=["K1"], options=["엑셀", "SQL"],
+            id="Q1",
+            section="A",
+            text="주로 쓰는 도구는?",
+            qtype=QuestionType.SINGLE,
+            knowledge_ids=["K1"],
+            options=["엑셀", "SQL"],
         )
         rendered = render_question(q)
         assert "엑셀" in rendered and "SQL" in rendered
@@ -251,15 +255,24 @@ class TestRenderQuestion:
 
     def test_rank_states_top_n(self):
         q = QuestionSpec(
-            id="Q2", section="A", text="순위는?", qtype=QuestionType.RANK,
-            knowledge_ids=["K1"], options=["a", "b", "c", "d"], config={"top_n": 3},
+            id="Q2",
+            section="A",
+            text="순위는?",
+            qtype=QuestionType.RANK,
+            knowledge_ids=["K1"],
+            options=["a", "b", "c", "d"],
+            config={"top_n": 3},
         )
         assert "3개" in render_question(q)
 
     def test_scale_states_anchors(self):
         q = QuestionSpec(
-            id="Q3", section="A", text="얼마나?", qtype=QuestionType.SCALE,
-            knowledge_ids=["K1"], scale_points=7,
+            id="Q3",
+            section="A",
+            text="얼마나?",
+            qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"],
+            scale_points=7,
             config={"anchor_low": "전혀", "anchor_high": "매우"},
         )
         rendered = render_question(q)
@@ -267,7 +280,10 @@ class TestRenderQuestion:
 
     def test_open_has_no_option_block(self):
         q = Question(
-            id="Q4", section="B", text="무엇을 입력하시겠습니까?", qtype=QuestionType.OPEN,
+            id="Q4",
+            section="B",
+            text="무엇을 입력하시겠습니까?",
+            qtype=QuestionType.OPEN,
             knowledge_ids=["K1"],
         )
         assert "선택지" not in render_question(q)
@@ -289,7 +305,8 @@ class TestParseRankWithOptions:
     def test_order_follows_response_not_option_order(self):
         raw = "차트 그림, 숫자가 들어 있는 표"
         assert parse_response(raw, QuestionType.RANK, options=self.OPTIONS) == [
-            "차트 그림", "숫자가 들어 있는 표",
+            "차트 그림",
+            "숫자가 들어 있는 표",
         ]
 
     def test_unlisted_text_is_dropped(self):
@@ -299,7 +316,8 @@ class TestParseRankWithOptions:
     def test_maxdiff_best_worst_labels(self):
         raw = "가장중요: 차트 그림, 가장덜중요: 한두 문장으로 요약된 설명"
         assert parse_response(raw, QuestionType.MAXDIFF, options=self.OPTIONS) == [
-            "차트 그림", "한두 문장으로 요약된 설명",
+            "차트 그림",
+            "한두 문장으로 요약된 설명",
         ]
 
 
@@ -377,9 +395,7 @@ class TestSurveyRunner:
         responses = SurveyRunner(MockAdapter()).run_survey(
             mini_survey, personas, make_config(repetitions=3)
         )
-        q1 = sorted(
-            (r for r in responses if r.question_id == "Q1"), key=lambda r: r.repetition
-        )
+        q1 = sorted((r for r in responses if r.question_id == "Q1"), key=lambda r: r.repetition)
         assert [r.repetition for r in q1] == [0, 1, 2]
 
     def test_jsonl_logging_and_resume(self, mini_survey, tmp_path):

@@ -221,9 +221,15 @@ def create_sample_manifest() -> SampleManifest:
     ]
 
     assignments = [
-        CellAssignment(uuid="persona-001", cell_id="C1", signal_score=0.85, price_sensitivity_score=0.4),
-        CellAssignment(uuid="persona-002", cell_id="C1", signal_score=0.78, price_sensitivity_score=0.5),
-        CellAssignment(uuid="persona-003", cell_id="C2", signal_score=0.92, price_sensitivity_score=0.3),
+        CellAssignment(
+            uuid="persona-001", cell_id="C1", signal_score=0.85, price_sensitivity_score=0.4
+        ),
+        CellAssignment(
+            uuid="persona-002", cell_id="C1", signal_score=0.78, price_sensitivity_score=0.5
+        ),
+        CellAssignment(
+            uuid="persona-003", cell_id="C2", signal_score=0.92, price_sensitivity_score=0.3
+        ),
     ]
 
     return SampleManifest(

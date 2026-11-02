@@ -97,11 +97,7 @@ def _share(values: list, option: str) -> float | None:
     counted = [v for v in values if v is not None]
     if not counted:
         return None
-    hits = sum(
-        1
-        for v in counted
-        if (option in v if isinstance(v, (list, tuple)) else v == option)
-    )
+    hits = sum(1 for v in counted if (option in v if isinstance(v, (list, tuple)) else v == option))
     return hits / len(counted)
 
 
@@ -131,9 +127,7 @@ def _expect_matches(
         if not order:
             return None
         return sum(
-            1
-            for v in values
-            if isinstance(v, (list, tuple)) and list(v[: len(order)]) == order
+            1 for v in values if isinstance(v, (list, tuple)) and list(v[: len(order)]) == order
         )
 
     if kind == "segment_gap":
@@ -166,9 +160,7 @@ def _known_truth_matches(
     assert expected is not None
     # 설계 YAML이 싣는 형식 — {source, claim, expect:{kind, ...}, note}
     if isinstance(expected, dict) and isinstance(expected.get("expect"), dict):
-        return _expect_matches(
-            question, expected["expect"], values, uuids or [], segments or {}
-        )
+        return _expect_matches(question, expected["expect"], values, uuids or [], segments or {})
     if isinstance(expected, dict) and "range" in expected:
         lo, hi = expected["range"]
         return sum(1 for v in values if isinstance(v, (int, float)) and lo <= v <= hi)
@@ -276,9 +268,7 @@ def _pairwise_tau(rank_lists: list[list]) -> list[float]:
         common = sorted(set(pos_a) & set(pos_b))
         if len(common) < 2:
             continue
-        tau, _ = stats.kendalltau(
-            [pos_a[c] for c in common], [pos_b[c] for c in common]
-        )
+        tau, _ = stats.kendalltau([pos_a[c] for c in common], [pos_b[c] for c in common])
         if not math.isnan(tau):
             taus.append(float(tau))
     return taus
@@ -398,9 +388,7 @@ def check_cross_model(
         per_model = by_q_model.get(question.id)
         if not per_model or len(per_model) < 2:
             continue
-        conclusions = [
-            _question_conclusion(question, vals) for vals in per_model.values()
-        ]
+        conclusions = [_question_conclusion(question, vals) for vals in per_model.values()]
         if any(c is None for c in conclusions):
             continue
         comparable += 1

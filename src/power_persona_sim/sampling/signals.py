@@ -65,9 +65,7 @@ def load_signals(path: Path | str) -> SignalConfig:
     price = _signal("price_sensitivity", price_raw) if price_raw else None
 
     narrative = raw.get("persona_narrative") or {}
-    fields = tuple(
-        (str(f["label"]), str(f["column"])) for f in (narrative.get("fields") or [])
-    )
+    fields = tuple((str(f["label"]), str(f["column"])) for f in (narrative.get("fields") or []))
     if narrative and not fields:
         raise ValueError(f"persona_narrative에 fields가 없습니다: {path}")
 

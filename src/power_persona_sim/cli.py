@@ -110,7 +110,9 @@ def run_run_cmd(args: argparse.Namespace) -> int:
     if config.dry_run:
         print("[DRY RUN] 실행하지 않았습니다.")
         print(f"  Adapter/Model: {config.adapter}/{config.model}")
-        print(f"  페르소나 {len(personas)}명 × 문항 {len(survey.questions)}개 × 반복 {config.repetitions}회")
+        print(
+            f"  페르소나 {len(personas)}명 × 문항 {len(survey.questions)}개 × 반복 {config.repetitions}회"
+        )
         print(f"  {estimate.summary()}")
         print("\n실행하려면 --no-dry-run 플래그를 사용하세요.")
         return 0
@@ -266,7 +268,9 @@ def main() -> None:
 
     # validate
     validate_parser = subparsers.add_parser("validate", help="타당성 검증")
-    validate_parser.add_argument("responses", help="응답 jsonl 경로 (run이 남긴 results/raw/*.jsonl)")
+    validate_parser.add_argument(
+        "responses", help="응답 jsonl 경로 (run이 남긴 results/raw/*.jsonl)"
+    )
     validate_parser.add_argument("--survey", required=True, help="설문 YAML 경로")
     validate_parser.add_argument("--manifest", required=True, help="표본 manifest JSON 경로")
     validate_parser.add_argument("--benchmark", help="셀별 기대 비율 YAML (configs/benchmarks/)")
@@ -278,7 +282,9 @@ def main() -> None:
     report_parser.add_argument("--survey", required=True, help="설문 YAML 경로")
     report_parser.add_argument("--manifest", required=True, help="표본 manifest JSON 경로")
     report_parser.add_argument("--benchmark", help="셀별 기대 비율 YAML (configs/benchmarks/)")
-    report_parser.add_argument("--out", default="results/report", help="출력 디렉터리 (기본: results/report)")
+    report_parser.add_argument(
+        "--out", default="results/report", help="출력 디렉터리 (기본: results/report)"
+    )
     report_parser.set_defaults(func=run_report_cmd)
 
     args = parser.parse_args()

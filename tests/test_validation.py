@@ -32,7 +32,9 @@ def make_manifest(cell_counts: dict[str, int]) -> SampleManifest:
         for _ in range(n):
             assignments.append(
                 CellAssignment(
-                    uuid=f"uuid-{i}", cell_id=cell_id, signal_score=1.0,
+                    uuid=f"uuid-{i}",
+                    cell_id=cell_id,
+                    signal_score=1.0,
                     price_sensitivity_score=0.0,
                 )
             )
@@ -55,9 +57,11 @@ def make_survey(questions: list[Question]) -> Survey:
     return Survey(
         id="test",
         goal=Goal(
-            business_goal="g", decision="d",
+            business_goal="g",
+            decision="d",
             levers=[Lever(id="L1", name="l")],
-            success_criteria="s", one_sentence="o",
+            success_criteria="s",
+            one_sentence="o",
         ),
         knowledge=[Knowledge(id="K1", statement="s", lever_ids=["L1"], judgement_rule="j")],
         questions=questions,
@@ -85,12 +89,20 @@ def make_response(
 
 
 SCALE_Q = Question(
-    id="Q1", section="A", text="점수?", qtype=QuestionType.SCALE,
-    knowledge_ids=["K1"], scale_points=10,
+    id="Q1",
+    section="A",
+    text="점수?",
+    qtype=QuestionType.SCALE,
+    knowledge_ids=["K1"],
+    scale_points=10,
 )
 RANK_Q = Question(
-    id="Q2", section="B", text="순위?", qtype=QuestionType.RANK,
-    knowledge_ids=["K1"], options=["a", "b", "c"],
+    id="Q2",
+    section="B",
+    text="순위?",
+    qtype=QuestionType.RANK,
+    knowledge_ids=["K1"],
+    options=["a", "b", "c"],
 )
 
 
@@ -129,8 +141,13 @@ class TestKnownTruth:
 
     def test_low_reproduction_rate_fails(self):
         q = Question(
-            id="Q1", section="A", text="점수?", qtype=QuestionType.SCALE,
-            knowledge_ids=["K1"], scale_points=10, known_truth={"range": [8, 10]},
+            id="Q1",
+            section="A",
+            text="점수?",
+            qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"],
+            scale_points=10,
+            known_truth={"range": [8, 10]},
         )
         survey = make_survey([q])
         # 10건 중 1건만 정답 범위 — 옛 구현(매치>0이면 통과)이라면 통과했을 케이스
@@ -143,8 +160,13 @@ class TestKnownTruth:
 
     def test_high_reproduction_rate_passes(self):
         q = Question(
-            id="Q1", section="A", text="점수?", qtype=QuestionType.SCALE,
-            knowledge_ids=["K1"], scale_points=10, known_truth={"range": [1, 10]},
+            id="Q1",
+            section="A",
+            text="점수?",
+            qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"],
+            scale_points=10,
+            known_truth={"range": [1, 10]},
         )
         survey = make_survey([q])
         responses = [make_response("Q1", 5, persona_uuid=f"u{i}") for i in range(10)]
@@ -152,8 +174,13 @@ class TestKnownTruth:
 
     def test_missing_responses_fail(self):
         q = Question(
-            id="Q1", section="A", text="점수?", qtype=QuestionType.SCALE,
-            knowledge_ids=["K1"], scale_points=10, known_truth={"range": [1, 10]},
+            id="Q1",
+            section="A",
+            text="점수?",
+            qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"],
+            scale_points=10,
+            known_truth={"range": [1, 10]},
         )
         assert check_known_truth([], make_survey([q])).passed is False
 
@@ -161,8 +188,12 @@ class TestKnownTruth:
 def _kt_question(expect: dict, options: list[str]) -> Question:
     """설계 YAML이 싣는 known_truth 형식 그대로의 문항."""
     return Question(
-        id="Q1", section="A", text="도구?", qtype=QuestionType.SINGLE,
-        knowledge_ids=["K1"], options=options,
+        id="Q1",
+        section="A",
+        text="도구?",
+        qtype=QuestionType.SINGLE,
+        knowledge_ids=["K1"],
+        options=options,
         known_truth={"source": "s", "claim": "c", "expect": expect},
     )
 
@@ -192,10 +223,15 @@ class TestKnownTruthExpectSchema:
 
     def test_rank_order_prefix_match(self):
         q = Question(
-            id="Q1", section="A", text="순위?", qtype=QuestionType.RANK,
-            knowledge_ids=["K1"], options=["a", "b", "c"],
+            id="Q1",
+            section="A",
+            text="순위?",
+            qtype=QuestionType.RANK,
+            knowledge_ids=["K1"],
+            options=["a", "b", "c"],
             known_truth={
-                "source": "s", "claim": "c",
+                "source": "s",
+                "claim": "c",
                 "expect": {"kind": "rank_order", "order": ["a", "b"]},
             },
         )
@@ -207,8 +243,11 @@ class TestKnownTruthExpectSchema:
     def test_segment_gap_direction_holds(self):
         q = _kt_question(
             {
-                "kind": "segment_gap", "segment_by": "age_band",
-                "option": "SQL", "higher": "25-34", "lower": "45-59",
+                "kind": "segment_gap",
+                "segment_by": "age_band",
+                "option": "SQL",
+                "higher": "25-34",
+                "lower": "45-59",
             },
             self.OPTIONS,
         )
@@ -223,8 +262,11 @@ class TestKnownTruthExpectSchema:
     def test_segment_gap_direction_reversed_fails(self):
         q = _kt_question(
             {
-                "kind": "segment_gap", "segment_by": "age_band",
-                "option": "SQL", "higher": "25-34", "lower": "45-59",
+                "kind": "segment_gap",
+                "segment_by": "age_band",
+                "option": "SQL",
+                "higher": "25-34",
+                "lower": "45-59",
             },
             self.OPTIONS,
         )
@@ -239,8 +281,11 @@ class TestKnownTruthExpectSchema:
     def test_segment_gap_without_manifest_is_unscorable_not_silent_pass(self):
         q = _kt_question(
             {
-                "kind": "segment_gap", "segment_by": "age_band",
-                "option": "SQL", "higher": "25-34", "lower": "45-59",
+                "kind": "segment_gap",
+                "segment_by": "age_band",
+                "option": "SQL",
+                "higher": "25-34",
+                "lower": "45-59",
             },
             self.OPTIONS,
         )
@@ -253,9 +298,7 @@ class TestKnownTruthExpectSchema:
 class TestSelfConsistency:
     def test_consistent_ranks_pass(self):
         survey = make_survey([RANK_Q])
-        responses = [
-            make_response("Q2", ["a", "b", "c"], repetition=rep) for rep in range(3)
-        ]
+        responses = [make_response("Q2", ["a", "b", "c"], repetition=rep) for rep in range(3)]
         check, excluded = check_self_consistency(responses, survey)
         assert check.passed is True
         assert excluded == []
@@ -273,17 +316,13 @@ class TestSelfConsistency:
 
     def test_unstable_scale_excluded(self):
         survey = make_survey([SCALE_Q])
-        responses = [
-            make_response("Q1", v, repetition=rep) for rep, v in enumerate([1, 9, 2])
-        ]
+        responses = [make_response("Q1", v, repetition=rep) for rep, v in enumerate([1, 9, 2])]
         _check, excluded = check_self_consistency(responses, survey)
         assert excluded == ["Q1"]
 
     def test_stable_scale_passes(self):
         survey = make_survey([SCALE_Q])
-        responses = [
-            make_response("Q1", v, repetition=rep) for rep, v in enumerate([7, 7, 8])
-        ]
+        responses = [make_response("Q1", v, repetition=rep) for rep, v in enumerate([7, 7, 8])]
         _, excluded = check_self_consistency(responses, survey)
         assert excluded == []
 
@@ -324,8 +363,13 @@ class TestValidate:
 
     def test_known_truth_failure_forces_discard(self):
         q = Question(
-            id="Q1", section="A", text="점수?", qtype=QuestionType.SCALE,
-            knowledge_ids=["K1"], scale_points=10, known_truth={"range": [9, 10]},
+            id="Q1",
+            section="A",
+            text="점수?",
+            qtype=QuestionType.SCALE,
+            knowledge_ids=["K1"],
+            scale_points=10,
+            known_truth={"range": [9, 10]},
         )
         survey = make_survey([q])
         responses = [make_response("Q1", 1, persona_uuid=f"u{i}") for i in range(5)]
@@ -364,8 +408,12 @@ class TestE2E:
         survey = make_survey(
             [
                 Question(
-                    id="Q1", section="A", text="최근 구매 만족도를 1~10점으로?",
-                    qtype=QuestionType.SCALE, knowledge_ids=["K1"], scale_points=10,
+                    id="Q1",
+                    section="A",
+                    text="최근 구매 만족도를 1~10점으로?",
+                    qtype=QuestionType.SCALE,
+                    knowledge_ids=["K1"],
+                    scale_points=10,
                     known_truth={"range": [1, 10]},
                 )
             ]

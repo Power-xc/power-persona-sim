@@ -156,7 +156,9 @@ def render_question(question: Question) -> str:
         parts.append(f"\n1({low})부터 {points}({high})까지 중 숫자 하나만 답하세요.")
     elif question.qtype == QuestionType.NUMERIC:
         unit = config.get("unit", "")
-        parts.append(f"\n숫자 하나만 답하세요{f' (단위: {unit})' if unit else ''}. 설명은 쓰지 마세요.")
+        parts.append(
+            f"\n숫자 하나만 답하세요{f' (단위: {unit})' if unit else ''}. 설명은 쓰지 마세요."
+        )
     elif question.qtype == QuestionType.OPEN:
         parts.append("\n한두 문장으로 짧게 답하세요.")
 
@@ -288,9 +290,7 @@ class SurveyRunner:
         """
         run_id = build_run_id(survey, config)
         log_path = self._log_path(run_id)
-        completed, responses = (
-            self._load_completed(log_path) if log_path else (set(), [])
-        )
+        completed, responses = self._load_completed(log_path) if log_path else (set(), [])
 
         log_file = log_path.open("a", encoding="utf-8") if log_path else None
         try:
