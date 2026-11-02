@@ -50,7 +50,9 @@ flowchart TD
     classDef store fill:#2da44e,stroke:#1a7f37,color:#fff
     class RUN,ADP ai
     class DS,CFG,SVY,BENCH,OUT store
-    style ENGINE fill:transparent,stroke:#8c959f,stroke-dasharray:4 3
+
+  style ENGINE fill:transparent,stroke:#8c959f,stroke-dasharray:4 3
+    
 ```
 
 파이프라인을 관통하는 원칙이 둘 있다. **재현성** — run_id·파생 시드·prompt_hash가 전부 입력값의 해시라서, 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다. **관문** — 유료 호출 앞에는 비용 게이트가, 리포트 앞에는 검증 판정이 서 있고, 둘 다 우회할 수 없게 구조에 박혀 있다.
