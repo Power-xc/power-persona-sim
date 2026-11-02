@@ -190,6 +190,8 @@ def parse_response(
             return raw_text
         matched = [opt for opt in options if opt.lower() in raw_text.lower()]
         if qtype == QuestionType.SINGLE:
+            # 알려진 한계: 선택지와 맞지 않으면 원문을 그대로 parsed에 둔다.
+            # 기존 실행과의 결과 비교를 깨지 않으려고 파싱 규칙은 바꾸지 않는다 (README 「한계」).
             return matched[0] if matched else raw_text
         return matched if matched else [x.strip() for x in raw_text.split(",")]
 
