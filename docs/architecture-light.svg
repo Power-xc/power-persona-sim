@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="828" height="408" viewBox="-4 -4 828 408" role="img" aria-label="power-persona-sim 아키텍처: 입력 4종이 표본 추출과 조사 설계를 거쳐 비용 게이트, 어댑터, 검증, 리포트로 흐른다">
+<defs><marker id="head-light" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text x="0" y="10" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11" font-weight="600" fill="#818b98" text-anchor="start">입력</text>
+<text x="820" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11" font-weight="600" fill="#818b98" text-anchor="end">엔진 · src/power_persona_sim</text>
+<text x="242" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11" font-weight="600" fill="#818b98" text-anchor="middle">dry-run 기본 · 승인 시에만 실행</text>
+<path d="M74 92 L74 105 Q74 111 80 111 L138 111 Q144 111 144 117 L144 130" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M242 92 L242 105 Q242 111 236 111 L178 111 Q172 111 172 117 L172 130" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M410 92 L410 130" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M158 186 L158 200 Q158 206 152 206 L68 206 Q62 206 62 212 L62 224" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M410 186 L410 210 Q410 216 404 216 L90 216 Q86 216 86 220 L86 224" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M148 258 L168 258" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M316 258 L336 258" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M484 258 L504 258" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M652 258 L672 258" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M578 92 L578 224" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M746 292 L746 330" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#head-light)"/>
+<path d="M0.5 28.5 a74 6 0 0 1 148 0 v58 a74 6 0 0 1 -148 0 z M0.5 28.5 a74 6 0 0 0 148 0" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="74" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">페르소나 데이터셋</text>
+<text x="74" y="66" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">Nemotron Personas</text>
+<text x="74" y="82" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">Korea · 100만 명</text>
+<path d="M168.5 28.5 a74 6 0 0 1 148 0 v58 a74 6 0 0 1 -148 0 z M168.5 28.5 a74 6 0 0 0 148 0" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="242" y="57" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">configs/</text>
+<text x="242" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">신호 사전 · 셀 설계</text>
+<path d="M336.5 28.5 a74 6 0 0 1 148 0 v58 a74 6 0 0 1 -148 0 z M336.5 28.5 a74 6 0 0 0 148 0" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="410" y="57" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">cases/*/design/</text>
+<text x="410" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">설문 · IDI 설계</text>
+<path d="M504.5 28.5 a74 6 0 0 1 148 0 v58 a74 6 0 0 1 -148 0 z M504.5 28.5 a74 6 0 0 0 148 0" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="578" y="57" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">configs/benchmarks/</text>
+<text x="578" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">KOSIS · KREI 기준값</text>
+<rect x="84.5" y="130.5" width="148" height="56" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="158" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Sampling</text>
+<text x="158" y="171" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">3단계 표본 추출</text>
+<rect x="336.5" y="130.5" width="148" height="56" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="410" y="154" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Design</text>
+<text x="410" y="171" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">커버리지 규율</text>
+<rect x="0.5" y="224.5" width="148" height="68" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="74" y="254" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Runner</text>
+<text x="74" y="271" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">프롬프트 · 시드 파생</text>
+<path d="M242.5 224.5 L316.5 258.5 L242.5 292.5 L168.5 258.5 Z" fill="none" stroke="#d1d9e0" stroke-width="1" stroke-linejoin="round"/>
+<text x="242" y="262" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Cost Gate</text>
+<rect x="336.5" y="224.5" width="148" height="68" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="410" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Adapters</text>
+<text x="410" y="263" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">mock · ollama</text>
+<text x="410" y="279" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">claude · gemini</text>
+<rect x="504.5" y="224.5" width="148" height="68" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="578" y="254" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Validation</text>
+<text x="578" y="271" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">χ² · known-truth · τ</text>
+<rect x="672.5" y="224.5" width="148" height="68" rx="8" fill="none" stroke="#d1d9e0" stroke-width="1"/>
+<text x="746" y="254" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#1f2328" text-anchor="middle">Report</text>
+<text x="746" y="271" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">상대 비교 전용</text>
+<path d="M672.5 336.5 a74 6 0 0 1 148 0 v58 a74 6 0 0 1 -148 0 z M672.5 336.5 a74 6 0 0 0 148 0" fill="none" stroke="#0969da" stroke-width="1"/>
+<text x="746" y="357" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="13" font-weight="600" fill="#0969da" text-anchor="middle">Artifacts</text>
+<text x="746" y="374" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">manifest · jsonl</text>
+<text x="746" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif" font-size="11.5" font-weight="400" fill="#59636e" text-anchor="middle">report.html</text>
+</svg>

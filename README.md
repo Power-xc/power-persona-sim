@@ -6,7 +6,7 @@
 
 ---
 
-## 무엇을 하는 도구인가
+## 개요
 
 조사 목적 한 줄을 입력하면, 100만 건의 통계 정합 합성 페르소나 중에서 목적에 맞는 표본을 골라내고, 그 페르소나들에게 설문과 심층인터뷰를 실행해 결과를 돌려준다.
 
@@ -22,40 +22,17 @@
 
 ## 시스템 아키텍처
 
-```mermaid
-%%{init: {"flowchart": {"subGraphTitleMargin": {"top": 8, "bottom": 8}, "rankSpacing": 34, "nodeSpacing": 24}, "themeVariables": {"fontSize": "13px"}}}%%
-flowchart TD
-    DS[("NVIDIA Nemotron Personas Korea<br/>100만 페르소나")]
-    CFG[("configs/<br/>신호 사전 · 셀 설계")]
-    SVY[("cases/*/design/<br/>설문 · IDI 설계")]
-    BENCH[("configs/benchmarks/<br/>KOSIS·KREI 기준값")]
-    subgraph ENGINE["Engine · src/power_persona_sim"]
-        SMP["Sampling<br/>3단계 표본 추출"]
-        DSG["Design<br/>커버리지 규율"]
-        RUN["Runner<br/>프롬프트 · 시드 파생"]
-        GATE{"Cost Gate"}
-        ADP["Adapters<br/>mock·ollama·claude·gemini"]
-        VAL["Validation<br/>χ²·known-truth·τ·교차"]
-        RPT["Report<br/>상대 비교 전용"]
-        SMP & DSG --> RUN --> GATE
-        GATE -->|"dry-run 기본 · 승인 시에만"| ADP --> VAL --> RPT
-    end
-    OUT[("Artifacts<br/>manifest · jsonl · report.html")]
-    RPT --> OUT
-    DS & CFG --> SMP
-    SVY --> DSG
-    BENCH --> VAL
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Power-xc/power-persona-sim/main/docs/architecture-dark.svg" />
+  <img src="https://raw.githubusercontent.com/Power-xc/power-persona-sim/main/docs/architecture-light.svg" alt="입력 4종이 표본 추출과 조사 설계를 거쳐 비용 게이트, 어댑터, 검증, 리포트로 흐르고 산출물이 남는다" />
+</picture>
 
-    classDef ai fill:#8957e5,stroke:#6e40c9,color:#fff
-    classDef store fill:#2da44e,stroke:#1a7f37,color:#fff
-    class RUN,ADP ai
-    class DS,CFG,SVY,BENCH,OUT store
+입력 4종(데이터셋·`configs/`·`cases/*/design/`·`configs/benchmarks/`)이 Sampling과 Design을 거쳐 Runner로 모인다. Runner는 비용 게이트를 지나 Adapters를 호출하고, 응답은 Validation과 Report를 거쳐 Artifacts로 남는다. 기준값(`configs/benchmarks/`)은 Validation에 직접 들어간다.
 
-  style ENGINE fill:transparent,stroke:#8c959f,stroke-dasharray:4 3
-    
-```
+파이프라인에는 두 가지 원칙이 있다.
 
-파이프라인을 관통하는 원칙이 둘 있다. **재현성** — run_id·파생 시드·prompt_hash가 전부 입력값의 해시라서, 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다. **관문** — 유료 호출 앞에는 비용 게이트가, 리포트 앞에는 검증 판정이 서 있고, 둘 다 우회할 수 없게 구조에 박혀 있다.
+- **재현성**: run_id·파생 시드·prompt_hash는 모두 입력값의 해시다. 같은 설문·설정·seed면 언제 어디서 돌려도 같은 실행이다.
+- **관문**: 유료 호출 앞에는 비용 게이트가 있고, 리포트는 검증을 먼저 돌려 그 판정을 맨 위에 싣는다. 둘 다 건너뛸 수 없는 코드 경로다.
 
 ### 기술 구성
 
@@ -98,6 +75,7 @@ power-persona-sim/
 │   ├── report/                 # Jinja2 HTML 리포트
 │   └── cli.py                  # 파이프라인 5커맨드
 │
+├── docs/                       # 아키텍처 그림 (light·dark SVG)
 ├── configs/
 │   ├── signals/                # 카테고리별 신호 키워드 사전 (교체 지점)
 │   ├── cells/                  # 셀 축·쿼터 설계
@@ -106,7 +84,7 @@ power-persona-sim/
 ├── cases/
 │   └── cheongwayeon/           # 첫 케이스 — 설계 YAML 5종 + 제품 스펙
 │
-├── tests/                      # 190여 개 — 전부 오프라인 실행
+├── tests/                      # 200여 개 — 전부 오프라인 실행
 ├── results/                    # 원응답 jsonl(시드 포함) · manifest — 커밋 제외
 ├── PROJECT-BRIEF.md            # 방법론·설계 전문
 ├── PREREG.md                   # 사전 등록 템플릿 (실행 파라미터 고정)
@@ -224,6 +202,8 @@ power-persona-sim report results/raw/<run_id>.jsonl --survey ... --manifest ... 
 - **표면 패턴**: LLM 페르소나는 표면 상관은 재현하나 심층 행동 규칙성은 실패한다. 신규 발견용이 아니라 가설 선별용.
 - **분산 축소**: RLHF 모델은 표현이 정제되어 태도 분산이 실제보다 작다. temperature와 반복 샘플링으로 보정 필요.
 - **정형화된 잡식성**: LLM 대리응답자는 실제보다 균일하게 폭넓은 취향을 보인다.
+- **선택지 불일치 응답**: SINGLE 문항에서 응답이 어떤 선택지와도 맞지 않으면 응답 원문이 그대로 `parsed`에 남는다. 기존 실행과의 비교를 위해 파싱 규칙은 아직 바꾸지 않았다.
+- **유료 어댑터 실호출 미구현**: `claude`·`gemini`는 dry-run과 비용 추정만 지원한다. `--no-dry-run`은 `mock`·`ollama`에서 동작한다.
 - **인간 캘리브레이션 필수**: 검증 단계 ④(인간 소수 표본)가 없으면 결과를 의사결정에 직접 사용하지 말 것.
 
 ## 데이터셋
